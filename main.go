@@ -1,29 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"github.com/ultrabear/bfi/compiler"
+	"github.com/ultrabear/bfi/constants"
+	"github.com/ultrabear/bfi/runtime"
 	"os"
 	"strings"
-	"fmt"
-	"github.com/ultrabear/bfi/runtime"
-	"github.com/ultrabear/bfi/constants"
-	"github.com/ultrabear/bfi/compiler"
 )
 
-func main () {
+func main() {
 
 	var indata string
 
 	if len(os.Args) > 2 && os.Args[1] == "f" {
 		cont, readerr := os.ReadFile(os.Args[2])
 		if readerr != nil {
-			fmt.Println(constants.Error + "Could not open file:", os.Args[2])
+			fmt.Println(constants.Error+"Could not open file:", os.Args[2])
 			os.Exit(1)
 		}
 		indata = string(cont)
 	} else {
 		indata = strings.Join(os.Args[1:], "")
 	}
-
 
 	// Check amount of loops
 	if strings.Count(indata, "[") != strings.Count(indata, "]") {

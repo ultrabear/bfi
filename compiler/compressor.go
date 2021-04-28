@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"strings"
 	"regexp"
+	"strings"
 )
 
 func countoccurances(indata *string) int {

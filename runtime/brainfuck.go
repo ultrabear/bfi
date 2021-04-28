@@ -1,17 +1,17 @@
 package runtime
 
 import (
-	"io"
 	"fmt"
-	"os"
 	"github.com/ultrabear/bfi/constants"
+	"io"
+	"os"
 )
 
 type Brainfuck struct {
-	buffer []byte
+	buffer  []byte
 	pointer int
-	stdin io.Reader
-	stdout io.Writer
+	stdin   io.Reader
+	stdout  io.Writer
 }
 
 func (bfc *Brainfuck) Inc() {
@@ -62,7 +62,6 @@ func (bfc *Brainfuck) DecPBy(amt uint) {
 	}
 }
 
-
 func (bfc *Brainfuck) Write() {
 	bfc.stdout.Write([]byte{bfc.buffer[bfc.pointer]})
 }
@@ -89,9 +88,9 @@ func (bfc *Brainfuck) Cur() int {
 
 func Initbfc(size int) Brainfuck {
 	return Brainfuck{
-		buffer: make([]byte, size),
+		buffer:  make([]byte, size),
 		pointer: 0,
-		stdin: os.Stdin,
-		stdout: os.Stdout,
+		stdin:   os.Stdin,
+		stdout:  os.Stdout,
 	}
 }

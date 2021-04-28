@@ -1,14 +1,14 @@
 package compiler
 
 import (
-	"os"
 	"fmt"
 	"github.com/ultrabear/bfi/constants"
+	"os"
 )
 
 type Looper struct {
 	precompiled [][]int
-	startloc []int
+	startloc    []int
 }
 
 func (L *Looper) Compileloops() map[int]int {
@@ -36,21 +36,20 @@ func (L *Looper) Compileloops() map[int]int {
 	return datamap
 }
 
-
 func GetJumpMap(intfuck []uint) map[int]int {
 
 	// Compile brainfuck loops (3 steps)
-	loops := Looper { // 1. Create looper object to handle loops
+	loops := Looper{ // 1. Create looper object to handle loops
 		precompiled: make([][]int, 0, len(intfuck)),
-		startloc: make([]int, 0, len(intfuck)),
+		startloc:    make([]int, 0, len(intfuck)),
 	}
 
 	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
 		switch intfuck[i] {
-			case 9, 10, 11, 12: // Skip over special instructions
-				i++
-			case 7, 8:
-				loops.precompiled = append(loops.precompiled, []int{i, int(intfuck[i])})
+		case 9, 10, 11, 12: // Skip over special instructions
+			i++
+		case 7, 8:
+			loops.precompiled = append(loops.precompiled, []int{i, int(intfuck[i])})
 		}
 	}
 
