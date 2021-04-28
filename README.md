@@ -6,15 +6,15 @@ The initial version of bfi was written in python, and then ported to golang wher
 While the goal of bfi is to be scriptable and convenient to just boot up on the commandline, it also hopes to be fast enough to handle most brainfuck in a timely matter, with a static compiling stage that doesnt run any brainfuck code while trying to optimize it  
 # Installation/Usage
 Install
-```
+```bash
 sudo make install
 ```
 Usage (argv)
-```
+```bash
 bfi "++++[>++++[>++++<-]>>++<<<-]>>+.>++." # Prints A and a newline
 ```
 Usage (files)
-```
+```bash
 bfi f <filename>
 ```
 # This implementation
