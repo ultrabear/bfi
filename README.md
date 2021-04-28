@@ -25,5 +25,5 @@ This implementation has 2 notable differences from most brainfuck compilers/inte
 - The buffer size is calculated at compile time based off the size of the input stream + 1
   - This will in theory never error on code that is stable as you can only move forwards once per instruction, but code that "flies" on its own such as `+[>+]` will almost instantly hit the end of the buffer and error
 Other notes on implementation
-- The execution environment is 8 bit brainfuck, there are no settings to use other sizes
+The execution environment is 8 bit brainfuck, there are no settings to use other sizes
  
