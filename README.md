@@ -26,4 +26,5 @@ bfi f <filename>
   - This will in theory never error on code that is stable as you can only move forwards once per instruction, but code that "flies" on its own such as `+[>+]` will almost instantly hit the end of the buffer and error  
 ## Other Notes  
 - The execution environment is 8 bit brainfuck, there are no settings to use other sizes  
- 
+# Credits
+All example programs came from the example sets from [El Brainfuck](https://copy.sh/brainfuck), a bf-to-JS compilier implementation with debugging tools and variable buffer widths
