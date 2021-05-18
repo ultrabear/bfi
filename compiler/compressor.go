@@ -5,13 +5,12 @@ import (
 	"strings"
 )
 
-func countoccurances(indata *string) int {
-	outdata := 0
-	outdata += strings.Count(*indata, "><") + strings.Count(*indata, "<>")
-	outdata += strings.Count(*indata, "+-") + strings.Count(*indata, "-+")
-	outdata += strings.Count(*indata, "[]")
-	outdata += strings.Count(*indata, "[->-[-]<]")
-	return outdata
+func countoccurances(indata string) bool {
+	if strings.Contains(indata, "><") || strings.Contains(indata, "<>") || strings.Contains(indata, "+-") || strings.Contains(indata, "-+") || strings.Contains(indata, "[]") || strings.Contains(indata, "[->-[-]<]") {
+		return true
+	} else {
+		return false
+	}
 }
 
 func stripoccurances(indata *string) string {
@@ -34,7 +33,7 @@ func filterbfc(indata *string) string {
 
 func CompressBFC(indata string) string {
 	export := filterbfc(&indata)
-	for countoccurances(&export) != 0 {
+	for countoccurances(export) {
 		export = stripoccurances(&export)
 	}
 	return export
