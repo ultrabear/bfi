@@ -111,7 +111,7 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {
-		next := *(*uint)(unsafe.Pointer(uintptr(SlicePtr)+(uintptr(i)*jumpBy)))
+		next := *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 		switch next {
 		case 0:
 			bfc.Zero()
@@ -137,19 +137,19 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 			}
 		case 9:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr)+(uintptr(i)*jumpBy)))
+			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 			bfc.IncBy(next)
 		case 10:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr)+(uintptr(i)*jumpBy)))
+			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 			bfc.DecBy(next)
 		case 11:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr)+(uintptr(i)*jumpBy)))
+			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 			bfc.IncPBy(next)
 		case 12:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr)+(uintptr(i)*jumpBy)))
+			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 			bfc.DecPBy(next)
 		}
 	}
