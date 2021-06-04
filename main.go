@@ -41,6 +41,6 @@ func main() {
 	bfc := runtime.Initbfc(len(brainfuck) + 1)
 
 	// Run brainfuck
-	bfc.Run(intfuck, jumpmap)
+	bfc.RunUnsafe(intfuck, jumpmap)
 
 }
