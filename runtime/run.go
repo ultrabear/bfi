@@ -102,6 +102,10 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 	// As noted this is unsafe and on a corrupt intfuck slice could read uninit memory instead of bounds check and panic
 	// Only use this when you know the input is not corrupt, for development it is worth it to swap to BrianFuck.Run
 
+	if len(intfuck) == 0 {
+		return
+	}
+
 	jumpBy := unsafe.Sizeof(uint(0))
 	SlicePtr := unsafe.Pointer(&(intfuck[0]))
 
