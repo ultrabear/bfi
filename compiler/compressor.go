@@ -34,9 +34,14 @@ func filterchunk(s string, filter *regexp.Regexp, rch chan string) {
 func filterbfc(indata *string) string {
 	gex := regexp.MustCompile("[\\[\\]\\-\\+\\>\\<\\,\\.]+")
 
+	// The following code is confusing and long but it simply allocates the entire
+	// string into smaller parts and then throws them at threads to be stripped seperateley
+	// this gives a considerable speed improvement
+
 	returns := make([]chan string, runtime.NumCPU())
 	splitwidth := (len(*indata) + (len(returns) - 1)) / len(returns)
 
+	// If the split size is so small many threads will probably only slow us down
 	if splitwidth < 100 {
 		rch := make(chan string)
 		go filterchunk(*indata, gex, rch)

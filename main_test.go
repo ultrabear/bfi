@@ -13,3 +13,13 @@ func TestRun(t *testing.T) {
 	RunFull(string(f))
 
 }
+
+func TestNormal(t *testing.T) {
+
+	RunFull("+")
+	RunFull("")
+	RunFull("[]")
+	RunFull("-[-]")
+	RunFull("++++[>++++[>++++<-]>>++<<<-]>>+.>++.")
+
+}
