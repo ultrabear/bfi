@@ -36,12 +36,12 @@ func (L *Looper) Compileloops() map[int]int {
 	return datamap
 }
 
-func GetJumpMap(intfuck []uint) map[int]int {
+func GetJumpMap(intfuck []uint, sizeof int) map[int]int {
 
 	// Compile brainfuck loops (3 steps)
 	loops := Looper{ // 1. Create looper object to handle loops
-		precompiled: make([][]int, 0, len(intfuck)),
-		startloc:    make([]int, 0, len(intfuck)),
+		precompiled: make([][]int, 0, sizeof),
+		startloc:    make([]int, 0, sizeof),
 	}
 
 	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list

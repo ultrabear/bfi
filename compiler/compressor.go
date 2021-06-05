@@ -40,7 +40,7 @@ func filterbfc(indata *string) string {
 	if splitwidth < 100 {
 		rch := make(chan string)
 		go filterchunk(*indata, gex, rch)
-		return <- rch
+		return <-rch
 	}
 
 	for i := 0; i < len(returns); i++ {

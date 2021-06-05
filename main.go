@@ -9,6 +9,29 @@ import (
 	"strings"
 )
 
+func RunFull(indata string) {
+
+	// Check amount of loops
+	if strings.Count(indata, "[") != strings.Count(indata, "]") {
+		fmt.Println(constants.SyntaxUnbalanced)
+		os.Exit(1)
+	}
+
+	// Compress brainfuck and run static optomizations
+	brainfuck := compiler.CompressBFC(indata)
+	brainfuck = strings.Replace(strings.Replace(brainfuck, "[-]", "0", -1), "[+]", "0", -1)
+
+	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck))
+	jumpmap := compiler.GetJumpMap(intfuck, strings.Count(brainfuck, "[")+strings.Count(brainfuck, "]"))
+
+	// Instantize brainfuck execution environment
+	bfc := runtime.Initbfc(len(brainfuck) + 1)
+
+	// Run brainfuck
+	bfc.RunUnsafe(intfuck, jumpmap)
+
+}
+
 func main() {
 
 	var indata string
@@ -24,23 +47,5 @@ func main() {
 		indata = strings.Join(os.Args[1:], "")
 	}
 
-	// Check amount of loops
-	if strings.Count(indata, "[") != strings.Count(indata, "]") {
-		fmt.Println(constants.SyntaxUnbalanced)
-		os.Exit(1)
-	}
-
-	// Compress brainfuck and run static optomizations
-	brainfuck := compiler.CompressBFC(indata)
-	brainfuck = strings.Replace(strings.Replace(brainfuck, "[-]", "0", -1), "[+]", "0", -1)
-
-	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck))
-	jumpmap := compiler.GetJumpMap(intfuck)
-
-	// Instantize brainfuck execution environment
-	bfc := runtime.Initbfc(len(brainfuck) + 1)
-
-	// Run brainfuck
-	bfc.RunUnsafe(intfuck, jumpmap)
-
+	RunFull(indata)
 }
