@@ -32,13 +32,17 @@ func filterchunk(s string, filter *regexp.Regexp, rch chan string) {
 }
 
 func filterbfc(indata *string) string {
-	gex, err := regexp.Compile("[\\[\\]\\-\\+\\>\\<\\,\\.]+")
-	if err != nil {
-		panic(err)
-	}
+	gex := regexp.MustCompile("[\\[\\]\\-\\+\\>\\<\\,\\.]+")
 
 	returns := make([]chan string, runtime.NumCPU())
 	splitwidth := (len(*indata) + (len(returns) - 1)) / len(returns)
+
+	if splitwidth < 100 {
+		rch := make(chan string)
+		go filterchunk(*indata, gex, rch)
+		return <- rch
+	}
+
 	for i := 0; i < len(returns); i++ {
 		returns[i] = make(chan string)
 		nextwidth := (splitwidth * i) + splitwidth
