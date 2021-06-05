@@ -22,7 +22,7 @@ func RunFull(indata string) {
 	brainfuck = strings.Replace(strings.Replace(brainfuck, "[-]", "0", -1), "[+]", "0", -1)
 
 	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck))
-	jumpmap := compiler.GetJumpMap(intfuck, strings.Count(brainfuck, "[")+strings.Count(brainfuck, "]"))
+	jumpmap := compiler.GetJumpMap(intfuck, strings.Count(brainfuck, "[")*2)
 
 	// Instantize brainfuck execution environment
 	bfc := runtime.Initbfc(len(brainfuck) + 1)

@@ -41,7 +41,7 @@ func GetJumpMap(intfuck []uint, sizeof int) map[int]int {
 	// Compile brainfuck loops (3 steps)
 	loops := Looper{ // 1. Create looper object to handle loops
 		precompiled: make([][]int, 0, sizeof),
-		startloc:    make([]int, 0, sizeof),
+		startloc:    make([]int, 0, (sizeof+1)/2),
 	}
 
 	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
