@@ -14,8 +14,8 @@ func countoccurances(indata string) bool {
 	}
 }
 
-func stripoccurances(indata *string) string {
-	outdata := strings.Replace(strings.Replace(*indata, "><", "", -1), "<>", "", -1)
+func stripoccurances(indata string) string {
+	outdata := strings.Replace(strings.Replace(indata, "><", "", -1), "<>", "", -1)
 	outdata = strings.Replace(strings.Replace(outdata, "+-", "", -1), "-+", "", -1)
 	outdata = strings.Replace(outdata, "[]", "", -1)
 	outdata = strings.Replace(outdata, "[->-[-]<]", "[-]>[-]<", -1)
@@ -31,7 +31,7 @@ func filterchunk(s string, filter *regexp.Regexp, rch chan string) {
 	rch <- strings.Join(joindata, "")
 }
 
-func filterbfc(indata *string) string {
+func filterbfc(indata string) string {
 	gex := regexp.MustCompile("[\\[\\]\\-\\+\\>\\<\\,\\.]+")
 
 	// The following code is confusing and long but it simply allocates the entire
@@ -39,22 +39,22 @@ func filterbfc(indata *string) string {
 	// this gives a considerable speed improvement
 
 	returns := make([]chan string, runtime.NumCPU())
-	splitwidth := (len(*indata) + (len(returns) - 1)) / len(returns)
+	splitwidth := (len(indata) + (len(returns) - 1)) / len(returns)
 
 	// If the split size is so small many threads will probably only slow us down
 	if splitwidth < 100 {
 		rch := make(chan string)
-		go filterchunk(*indata, gex, rch)
+		go filterchunk(indata, gex, rch)
 		return <-rch
 	}
 
 	for i := 0; i < len(returns); i++ {
 		returns[i] = make(chan string)
 		nextwidth := (splitwidth * i) + splitwidth
-		if nextwidth > len(*indata) {
-			nextwidth = len(*indata)
+		if nextwidth > len(indata) {
+			nextwidth = len(indata)
 		}
-		go filterchunk((*indata)[splitwidth*i:nextwidth], gex, returns[i])
+		go filterchunk((indata)[splitwidth*i:nextwidth], gex, returns[i])
 	}
 
 	joindata := make([]string, len(returns))
@@ -65,9 +65,9 @@ func filterbfc(indata *string) string {
 }
 
 func CompressBFC(indata string) string {
-	export := filterbfc(&indata)
+	export := filterbfc(indata)
 	for countoccurances(export) {
-		export = stripoccurances(&export)
+		export = stripoccurances(export)
 	}
 	return export
 }
