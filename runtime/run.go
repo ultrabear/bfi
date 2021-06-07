@@ -114,11 +114,11 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 		next := *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
 		switch next {
 		case 0:
-			bfc.Zero()
+			bfc.ZeroUnsafe()
 		case 1:
-			bfc.Inc()
+			bfc.IncUnsafe()
 		case 2:
-			bfc.Dec()
+			bfc.DecUnsafe()
 		case 3:
 			bfc.IncP()
 		case 4:
@@ -128,21 +128,21 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 		case 6:
 			bfc.Write()
 		case 7:
-			if bfc.Cur() == 0 {
+			if bfc.CurUnsafe() == 0 {
 				i = jumpmap[i]
 			}
 		case 8:
-			if bfc.Cur() != 0 {
+			if bfc.CurUnsafe() != 0 {
 				i = jumpmap[i]
 			}
 		case 9:
 			i++
 			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
-			bfc.IncBy(next)
+			bfc.IncByUnsafe(next)
 		case 10:
 			i++
 			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
-			bfc.DecBy(next)
+			bfc.DecByUnsafe(next)
 		case 11:
 			i++
 			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))

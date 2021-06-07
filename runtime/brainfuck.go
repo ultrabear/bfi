@@ -3,11 +3,13 @@ package runtime
 import (
 	"fmt"
 	"github.com/ultrabear/bfi/constants"
+	"unsafe"
 	"io"
 	"os"
 )
 
 type Brainfuck struct {
+	unbuffer uintptr
 	buffer  []byte
 	pointer int
 	stdin   io.Reader
@@ -18,16 +20,32 @@ func (bfc *Brainfuck) Inc() {
 	bfc.buffer[bfc.pointer]++
 }
 
+func (bfc *Brainfuck) IncUnsafe() {
+	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) += 1
+}
+
 func (bfc *Brainfuck) Dec() {
 	bfc.buffer[bfc.pointer]--
+}
+
+func (bfc *Brainfuck) DecUnsafe() {
+	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) -= 1
 }
 
 func (bfc *Brainfuck) IncBy(val uint) {
 	bfc.buffer[bfc.pointer] += byte(val)
 }
 
+func (bfc *Brainfuck) IncByUnsafe(val uint) {
+	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) += byte(val)
+}
+
 func (bfc *Brainfuck) DecBy(val uint) {
 	bfc.buffer[bfc.pointer] -= byte(val)
+}
+
+func (bfc *Brainfuck) DecByUnsafe(val uint) {
+	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) -= byte(val)
 }
 
 func (bfc *Brainfuck) IncP() {
@@ -82,15 +100,34 @@ func (bfc *Brainfuck) Zero() {
 	bfc.buffer[bfc.pointer] = 0
 }
 
+func (bfc *Brainfuck) ZeroUnsafe() {
+	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) = 0
+}
+
 func (bfc *Brainfuck) Cur() int {
 	return int(bfc.buffer[bfc.pointer])
 }
 
+func (bfc *Brainfuck) CurUnsafe() int {
+	return int(*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))))
+}
+
+type FakeSlice struct {
+	Pointer uintptr
+	Len uintptr
+	Cap uintptr
+}
+
 func Initbfc(size int) Brainfuck {
-	return Brainfuck{
+	bfc := Brainfuck{
 		buffer:  make([]byte, size),
 		pointer: 0,
 		stdin:   os.Stdin,
 		stdout:  os.Stdout,
 	}
+
+	bfc.unbuffer = ((*FakeSlice)(unsafe.Pointer(&bfc.buffer))).Pointer
+
+	return bfc
+
 }
