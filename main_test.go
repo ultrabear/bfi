@@ -3,23 +3,17 @@ package main
 import "testing"
 import "os"
 
-func TestRun(t *testing.T) {
 
-	f, e := os.ReadFile("./examples/beemovie.bf")
-	if e != nil {
-		panic(e)
+func TestNormal(T *testing.T) {
+
+	files, e := os.ReadDir("./examples/")
+	if e != nil {T.Error(e)}
+
+
+	for _, file := range files {
+		s, e := os.ReadFile("./examples/" + file.Name())
+		if e != nil {T.Error(e)}
+		RunFull(string(s))
 	}
-
-	RunFull(string(f))
-
-}
-
-func TestNormal(t *testing.T) {
-
-	RunFull("+")
-	RunFull("")
-	RunFull("[]")
-	RunFull("-[-]")
-	RunFull("++++[>++++[>++++<-]>>++<<<-]>>+.>++.")
 
 }
