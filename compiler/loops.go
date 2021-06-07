@@ -7,7 +7,7 @@ import (
 )
 
 type Looper struct {
-	precompiled [][]int
+	precompiled [][2]int
 	startloc    []int
 }
 
@@ -40,7 +40,7 @@ func GetJumpMap(intfuck []uint, sizeof int) map[int]int {
 
 	// Compile brainfuck loops (3 steps)
 	loops := Looper{ // 1. Create looper object to handle loops
-		precompiled: make([][]int, 0, sizeof),
+		precompiled: make([][2]int, 0, sizeof),
 		startloc:    make([]int, 0, (sizeof+1)/2),
 	}
 
@@ -49,7 +49,7 @@ func GetJumpMap(intfuck []uint, sizeof int) map[int]int {
 		case 9, 10, 11, 12: // Skip over special instructions
 			i++
 		case 7, 8:
-			loops.precompiled = append(loops.precompiled, []int{i, int(intfuck[i])})
+			loops.precompiled = append(loops.precompiled, [2]int{i, int(intfuck[i])})
 		}
 	}
 
