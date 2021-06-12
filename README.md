@@ -24,6 +24,10 @@ bfi f <filename>
   - A special behaviour of this is that `<` will raise an error for underflowing the pointer location but `<>` will raise no error as before it gets to runtime that is compiled out
 - The buffer size is calculated at compile time based off the count of `>` instructions or 30k as a minimum, for the brainfuck standard
   - In most cases this will not error on brainfuck, but some programs rely on buffer flying and may not function correctly
+- `[]` is compiled out entirely
+  - This was in a weak attempt to strip some comments from the program so that it does not affect runtime
+	- Notably programs such as `+[]` will not loop forever and will instead just run as `+` on another interpreter
+	- As `[]` is essentially an infinite loop this will not affect most programs
 ## Other Notes  
 - The execution environment is 8 bit brainfuck, there are no settings to use other sizes  
 # Credits
