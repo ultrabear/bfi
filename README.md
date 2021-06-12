@@ -22,7 +22,7 @@ bfi f <filename>
 - It will compress opposing instructions out of the loop entirely
   - What this means is that `+-` will be compiled to `NIL` and `<>` will be compiled to `NIL`
   - A special behaviour of this is that `<` will raise an error for underflowing the pointer location but `<>` will raise no error as before it gets to runtime that is compiled out
-- The buffer size is calculated at compile time based off the size of the input stream + 1
+- The buffer size is calculated at compile time based off the count of `>` instructions or 30k as a minimum, for the brainfuck standard
   - This will in theory never error on code that is stable as you can only move forwards once per instruction, but code that "flies" on its own such as `+[>+]` will almost instantly hit the end of the buffer and error  
 ## Other Notes  
 - The execution environment is 8 bit brainfuck, there are no settings to use other sizes  
