@@ -33,7 +33,7 @@ func RunFull(indata string) {
 	jumpmap := compiler.GetJumpMap(intfuck, strings.Count(brainfuck, "[")*2)
 
 	// Instantize brainfuck execution environment
-	bfc := runtime.Initbfc(max(strings.Count(brainfuck, ">") + 1, 30000))
+	bfc := runtime.Initbfc(max(strings.Count(brainfuck, ">")+1, 30000))
 
 	// Run brainfuck
 	bfc.RunUnsafe(intfuck, jumpmap)

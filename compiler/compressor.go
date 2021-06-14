@@ -1,65 +1,69 @@
 package compiler
 
 import (
-	"regexp"
 	"runtime"
 	"strings"
 )
 
 func countoccurances(indata string) bool {
-	if strings.Contains(indata, "><") || strings.Contains(indata, "<>") || strings.Contains(indata, "+-") || strings.Contains(indata, "-+") || strings.Contains(indata, "[]") || strings.Contains(indata, "[->-[-]<]") {
-		return true
-	} else {
-		return false
-	}
+	return strings.Contains(indata, "><") || strings.Contains(indata, "<>") || strings.Contains(indata, "+-") || strings.Contains(indata, "-+") || strings.Contains(indata, "[]") || strings.Contains(indata, "[->-[-]<]")
 }
 
 func stripoccurances(indata string) string {
-	outdata := strings.Replace(strings.Replace(indata, "><", "", -1), "<>", "", -1)
-	outdata = strings.Replace(strings.Replace(outdata, "+-", "", -1), "-+", "", -1)
-	outdata = strings.Replace(outdata, "[]", "", -1)
-	outdata = strings.Replace(outdata, "[->-[-]<]", "[-]>[-]<", -1)
-	return outdata
+	r := strings.NewReplacer("><", "", "<>", "", "+-", "", "-+", "", "[]", "", "[->-[-]<]", "[-]>[-]<")
+	return r.Replace(indata)
 }
 
-func filterchunk(s string, filter *regexp.Regexp, rch chan string) {
-	data := filter.FindAllStringSubmatch(s, -1)
-	joindata := make([]string, len(data))
-	for i, item := range data {
-		joindata[i] = strings.Join(item, "")
+// Filter a chunk to remove any non brainfuck instructions
+func filterchunk(s string, r chan string) {
+
+	var b strings.Builder
+
+	b.Grow(len(s))
+
+	for _, in := range s {
+		switch in {
+		case '+', '-', '>', '<', '[', ']', ',', '.':
+			b.WriteRune(in)
+		}
 	}
-	rch <- strings.Join(joindata, "")
+
+	r <- b.String()
 }
 
 func filterbfc(indata string) string {
-	gex := regexp.MustCompile("[\\[\\]\\-\\+\\>\\<\\,\\.]+")
 
 	// The following code is confusing and long but it simply allocates the entire
 	// string into smaller parts and then throws them at threads to be stripped seperateley
 	// this gives a considerable speed improvement
 
-	returns := make([]chan string, runtime.NumCPU())
-	splitwidth := (len(indata) + (len(returns) - 1)) / len(returns)
+	ncpu := runtime.NumCPU()
+
+	splitwidth := (len(indata) + (ncpu - 1)) / ncpu
 
 	// If the split size is so small many threads will probably only slow us down
 	if splitwidth < 100 {
 		rch := make(chan string)
-		go filterchunk(indata, gex, rch)
+		go filterchunk(indata, rch)
 		return <-rch
 	}
 
+	returns := make([]chan string, ncpu)
+
+	// Send jobs to threads
 	for i := 0; i < len(returns); i++ {
 		returns[i] = make(chan string)
 		nextwidth := (splitwidth * i) + splitwidth
 		if nextwidth > len(indata) {
 			nextwidth = len(indata)
 		}
-		go filterchunk((indata)[splitwidth*i:nextwidth], gex, returns[i])
+		go filterchunk((indata)[splitwidth*i:nextwidth], returns[i])
 	}
 
-	joindata := make([]string, len(returns))
-	for i, item := range returns {
-		joindata[i] = <-item
+	// Get data back from threads
+	joindata := make([]string, 0, len(returns))
+	for _, item := range returns {
+		joindata = append(joindata, <-item)
 	}
 	return strings.Join(joindata, "")
 }

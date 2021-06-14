@@ -3,17 +3,17 @@ package runtime
 import (
 	"fmt"
 	"github.com/ultrabear/bfi/constants"
-	"unsafe"
 	"io"
 	"os"
+	"unsafe"
 )
 
 type Brainfuck struct {
 	unbuffer uintptr
-	buffer  []byte
-	pointer int
-	stdin   io.Reader
-	stdout  io.Writer
+	buffer   []byte
+	pointer  int
+	stdin    io.Reader
+	stdout   io.Writer
 }
 
 func (bfc *Brainfuck) Inc() {
@@ -21,7 +21,7 @@ func (bfc *Brainfuck) Inc() {
 }
 
 func (bfc *Brainfuck) IncUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) += 1
+	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) += 1
 }
 
 func (bfc *Brainfuck) Dec() {
@@ -29,7 +29,7 @@ func (bfc *Brainfuck) Dec() {
 }
 
 func (bfc *Brainfuck) DecUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) -= 1
+	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) -= 1
 }
 
 func (bfc *Brainfuck) IncBy(val uint) {
@@ -37,7 +37,7 @@ func (bfc *Brainfuck) IncBy(val uint) {
 }
 
 func (bfc *Brainfuck) IncByUnsafe(val uint) {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) += byte(val)
+	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) += byte(val)
 }
 
 func (bfc *Brainfuck) DecBy(val uint) {
@@ -45,7 +45,7 @@ func (bfc *Brainfuck) DecBy(val uint) {
 }
 
 func (bfc *Brainfuck) DecByUnsafe(val uint) {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) -= byte(val)
+	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) -= byte(val)
 }
 
 func (bfc *Brainfuck) IncP() {
@@ -101,7 +101,7 @@ func (bfc *Brainfuck) Zero() {
 }
 
 func (bfc *Brainfuck) ZeroUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))) = 0
+	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) = 0
 }
 
 func (bfc *Brainfuck) Cur() int {
@@ -109,13 +109,13 @@ func (bfc *Brainfuck) Cur() int {
 }
 
 func (bfc *Brainfuck) CurUnsafe() int {
-	return int(*(*byte)(unsafe.Pointer(bfc.unbuffer+uintptr(bfc.pointer))))
+	return int(*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))))
 }
 
 type FakeSlice struct {
 	Pointer uintptr
-	Len uintptr
-	Cap uintptr
+	Len     uintptr
+	Cap     uintptr
 }
 
 func Initbfc(size int) Brainfuck {
