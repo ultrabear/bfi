@@ -24,7 +24,7 @@ func filterchunk(s string, r chan string) {
 	for _, in := range s {
 		switch in {
 		case '+', '-', '>', '<', '[', ']', ',', '.':
-			b.WriteRune(in)
+			b.WriteByte(byte(in))
 		}
 	}
 
