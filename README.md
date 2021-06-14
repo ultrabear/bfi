@@ -31,4 +31,5 @@ bfi f <filename>
 ## Other Notes  
 - The execution environment is 8 bit brainfuck, there are no settings to use other sizes  
 # Credits
-All example programs (except beemovie.bf) came from the example sets from [El Brainfuck](https://copy.sh/brainfuck), a bf-to-JS compilier implementation with debugging tools and variable buffer widths
+All example programs (except beemovie.bf) came from the example sets from [El Brainfuck](https://copy.sh/brainfuck), a bf-to-JS compilier implementation with debugging tools and variable buffer widths  
+Some misleading wording in the implementation notes was pointed out by [rdebath](https://github.com/rdebath), thanks!
