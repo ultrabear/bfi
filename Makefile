@@ -1,11 +1,11 @@
 GOCMD=go
 EXE=bfi
 
-bfi: *.go */*.go
+${EXE}: *.go */*.go
 	${GOCMD} build -o ${EXE}
 
-install: bfi
+install: ${EXE}
 	cp ./${EXE} /bin/${EXE}
 
-userinstall: bfi
+userinstall: ${EXE}
 	cp ./${EXE} ~/.local/bin/${EXE}
