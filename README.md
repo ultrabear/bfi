@@ -9,6 +9,15 @@ Install
 ```bash
 sudo make install
 ```
+Install (no root)
+```bash
+make userinstall
+```
+Makefile flags:
+```Makefile
+GOCMD=go # What go binary to use, if you use go get'd go versions
+EXE=bfi # Name of binary
+```
 Usage (argv)
 ```bash
 bfi "++++[>++++[>++++<-]>>++<<<-]>>+.>++." # Prints A and a newline
