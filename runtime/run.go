@@ -94,6 +94,10 @@ func (bfc *Brainfuck) Run(intfuck []uint, jumpmap map[int]int) {
 	}
 }
 
+func IndexUint(slice []uint, i int) *uint {
+	return (*uint)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice)))+ uintptr(i) * unsafe.Sizeof(uint(0))))
+}
+
 func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 
 	// Basically cursed, has a ~2.6% speed advantage over BrainFuck.Run
@@ -106,12 +110,9 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 		return
 	}
 
-	jumpBy := unsafe.Sizeof(uint(0))
-	SlicePtr := unsafe.Pointer(&(intfuck[0]))
-
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {
-		next := *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
+		next := *IndexUint(intfuck, i)
 		switch next {
 		case 0:
 			bfc.ZeroUnsafe()
@@ -137,19 +138,19 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 			}
 		case 9:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
+			next = *IndexUint(intfuck, i)
 			bfc.IncByUnsafe(next)
 		case 10:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
+			next = *IndexUint(intfuck, i)
 			bfc.DecByUnsafe(next)
 		case 11:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
+			next = *IndexUint(intfuck, i)
 			bfc.IncPBy(next)
 		case 12:
 			i++
-			next = *(*uint)(unsafe.Pointer(uintptr(SlicePtr) + (uintptr(i) * jumpBy)))
+			next = *IndexUint(intfuck, i)
 			bfc.DecPBy(next)
 		}
 	}

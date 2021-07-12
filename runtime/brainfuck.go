@@ -8,10 +8,13 @@ import (
 	"unsafe"
 )
 
+func IndexByte(slice []byte, i int) *byte {
+	return (*byte)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice))) + uintptr(i)))
+}
+
 type Brainfuck struct {
-	unbuffer uintptr
-	buffer   []byte
 	pointer  int
+	buffer   []byte
 	stdin    io.Reader
 	stdout   io.Writer
 }
@@ -21,7 +24,7 @@ func (bfc *Brainfuck) Inc() {
 }
 
 func (bfc *Brainfuck) IncUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) += 1
+	(*IndexByte(bfc.buffer, bfc.pointer))++
 }
 
 func (bfc *Brainfuck) Dec() {
@@ -29,7 +32,7 @@ func (bfc *Brainfuck) Dec() {
 }
 
 func (bfc *Brainfuck) DecUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) -= 1
+	(*IndexByte(bfc.buffer, bfc.pointer))--
 }
 
 func (bfc *Brainfuck) IncBy(val uint) {
@@ -37,7 +40,7 @@ func (bfc *Brainfuck) IncBy(val uint) {
 }
 
 func (bfc *Brainfuck) IncByUnsafe(val uint) {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) += byte(val)
+	(*IndexByte(bfc.buffer, bfc.pointer)) += byte(val)
 }
 
 func (bfc *Brainfuck) DecBy(val uint) {
@@ -45,7 +48,7 @@ func (bfc *Brainfuck) DecBy(val uint) {
 }
 
 func (bfc *Brainfuck) DecByUnsafe(val uint) {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) -= byte(val)
+	(*IndexByte(bfc.buffer, bfc.pointer)) -= byte(val)
 }
 
 func (bfc *Brainfuck) IncP() {
@@ -101,7 +104,7 @@ func (bfc *Brainfuck) Zero() {
 }
 
 func (bfc *Brainfuck) ZeroUnsafe() {
-	*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))) = 0
+	(*IndexByte(bfc.buffer, bfc.pointer)) = 0
 }
 
 func (bfc *Brainfuck) Cur() int {
@@ -109,13 +112,7 @@ func (bfc *Brainfuck) Cur() int {
 }
 
 func (bfc *Brainfuck) CurUnsafe() int {
-	return int(*(*byte)(unsafe.Pointer(bfc.unbuffer + uintptr(bfc.pointer))))
-}
-
-type FakeSlice struct {
-	Pointer uintptr
-	Len     uintptr
-	Cap     uintptr
+	return int(*IndexByte(bfc.buffer, bfc.pointer))
 }
 
 func Initbfc(size int) Brainfuck {
@@ -125,8 +122,6 @@ func Initbfc(size int) Brainfuck {
 		stdin:   os.Stdin,
 		stdout:  os.Stdout,
 	}
-
-	bfc.unbuffer = ((*FakeSlice)(unsafe.Pointer(&bfc.buffer))).Pointer
 
 	return bfc
 
