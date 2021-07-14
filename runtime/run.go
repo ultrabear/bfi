@@ -54,7 +54,7 @@ func (bfc *Brainfuck) Run(intfuck []uint) {
 }
 
 func IndexUint(slice []uint, i int) *uint {
-	return (*uint)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice)))+ uintptr(i) * unsafe.Sizeof(uint(0))))
+	return (*uint)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice))) + uintptr(i)*unsafe.Sizeof(uint(0))))
 }
 
 func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {

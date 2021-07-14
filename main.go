@@ -6,8 +6,8 @@ import (
 	"github.com/ultrabear/bfi/constants"
 	"github.com/ultrabear/bfi/runtime"
 	"os"
-	"unsafe"
 	"strings"
+	"unsafe"
 )
 
 func max(x, y int) int {
@@ -32,11 +32,12 @@ func RunFull(indata string) {
 
 	// Compress brainfuck and run static optimizations
 	brainfuck := compiler.CompressBFC(indata)
-	brainfuck = strings.Replace(strings.Replace(brainfuck, "[-]", "0", -1), "[+]", "0", -1)
+	brainfuck = strings.NewReplacer("[-]", "0", "[+]", "0").Replace(brainfuck)
 
 	// Get count of loop items
-	LoopCount := strings.Count(brainfuck, "[")*2
+	LoopCount := strings.Count(brainfuck, "[") * 2
 
+	// Convert to intfuck and optimize
 	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck, LoopCount))
 	intfuck = compiler.GetJumpMap(intfuck, LoopCount)
 
@@ -45,7 +46,6 @@ func RunFull(indata string) {
 
 	// Run brainfuck
 	bfc.RunUnsafe(intfuck)
-
 }
 
 func main() {

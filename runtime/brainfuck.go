@@ -13,10 +13,10 @@ func IndexByte(slice []byte, i int) *byte {
 }
 
 type Brainfuck struct {
-	pointer  int
-	buffer   []byte
-	stdin    io.Reader
-	stdout   io.Writer
+	pointer int
+	buffer  []byte
+	stdin   io.Reader
+	stdout  io.Writer
 }
 
 func (bfc *Brainfuck) Inc() {

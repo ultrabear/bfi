@@ -85,7 +85,7 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 			v := jumpmap[len(intfuck)-i]
 
 			// Add index value to account for extra space taken by previous loop counts in slice
-			totalstream[len(totalstream)-i-lc] = uint(v+indexes[v]+1)
+			totalstream[len(totalstream)-i-lc] = uint(v + indexes[v] + 1)
 
 			// We add to the loop counter every loop to not lose track of rshift indexing
 			lc++
