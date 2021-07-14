@@ -4,50 +4,7 @@ import (
 	"unsafe"
 )
 
-func (bfc *Brainfuck) RunOld(intfuck []uint, jumpmap map[int]int) {
-
-	// Slower than switch statements somehow, ill leave it cause its neat but what the hell
-
-	funcmap := []func(){
-		bfc.Zero,
-		bfc.Inc,
-		bfc.Dec,
-		bfc.IncP,
-		bfc.DecP,
-		bfc.Read,
-		bfc.Write,
-	}
-
-	optifuncmap := []func(uint){
-		bfc.IncBy,
-		bfc.DecBy,
-		bfc.IncPBy,
-		bfc.DecPBy,
-	}
-
-	// Mainloop over brainfuck
-	for i := 0; i < len(intfuck); i++ {
-		switch intfuck[i] {
-		case 7:
-			if bfc.Cur() == 0 {
-				i = jumpmap[i]
-			}
-		case 8:
-			if bfc.Cur() != 0 {
-				i = jumpmap[i]
-			}
-		default:
-			if intfuck[i] <= 6 {
-				funcmap[intfuck[i]]()
-			} else {
-				optifuncmap[intfuck[i]-9](intfuck[i+1])
-				i++
-			}
-		}
-	}
-}
-
-func (bfc *Brainfuck) Run(intfuck []uint, jumpmap map[int]int) {
+func (bfc *Brainfuck) Run(intfuck []uint) {
 
 	// Can golang make it faster with pure switches?
 	// Benchmarks say yes somehow, this language has some
@@ -71,12 +28,14 @@ func (bfc *Brainfuck) Run(intfuck []uint, jumpmap map[int]int) {
 		case 6:
 			bfc.Write()
 		case 7:
+			i++
 			if bfc.Cur() == 0 {
-				i = jumpmap[i]
+				i = int(intfuck[i])
 			}
 		case 8:
+			i++
 			if bfc.Cur() != 0 {
-				i = jumpmap[i]
+				i = int(intfuck[i])
 			}
 		case 9:
 			i++
@@ -98,7 +57,7 @@ func IndexUint(slice []uint, i int) *uint {
 	return (*uint)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice)))+ uintptr(i) * unsafe.Sizeof(uint(0))))
 }
 
-func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
+func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 
 	// Basically cursed, has a ~2.6% speed advantage over BrainFuck.Run
 	// Reads from the slices underlying memory location using unsafe pointers
@@ -129,12 +88,14 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint, jumpmap map[int]int) {
 		case 6:
 			bfc.Write()
 		case 7:
+			i++
 			if bfc.CurUnsafe() == 0 {
-				i = jumpmap[i]
+				i = int(*IndexUint(intfuck, i))
 			}
 		case 8:
+			i++
 			if bfc.CurUnsafe() != 0 {
-				i = jumpmap[i]
+				i = int(*IndexUint(intfuck, i))
 			}
 		case 9:
 			i++

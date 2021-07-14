@@ -1,6 +1,6 @@
 package compiler
 
-func ToIntfuck(bfc string) []uint {
+func ToIntfuck(bfc string, extra int) []uint {
 
 	// Convert the brainfuck to indexes of a list
 	// This lets it avoid hashing and converting in the mainloop
@@ -17,7 +17,8 @@ func ToIntfuck(bfc string) []uint {
 	}
 
 	// Convert brainfuck string to intfuck
-	ints := make([]uint, 0, len(bfc))
+	// Extra is added for adding loop data inplace
+	ints := make([]uint, 0, len(bfc)+extra)
 	for _, item := range bfc {
 		if instr, ok := indexer[item]; ok {
 			ints = append(ints, instr)

@@ -6,6 +6,7 @@ import (
 	"github.com/ultrabear/bfi/constants"
 	"github.com/ultrabear/bfi/runtime"
 	"os"
+	"unsafe"
 	"strings"
 )
 
@@ -17,6 +18,10 @@ func max(x, y int) int {
 	}
 }
 
+func ustring(s []byte) string {
+	return *(*string)(unsafe.Pointer(&s))
+}
+
 func RunFull(indata string) {
 
 	// Check amount of loops
@@ -25,18 +30,21 @@ func RunFull(indata string) {
 		os.Exit(1)
 	}
 
-	// Compress brainfuck and run static optomizations
+	// Compress brainfuck and run static optimizations
 	brainfuck := compiler.CompressBFC(indata)
 	brainfuck = strings.Replace(strings.Replace(brainfuck, "[-]", "0", -1), "[+]", "0", -1)
 
-	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck))
-	jumpmap := compiler.GetJumpMap(intfuck, strings.Count(brainfuck, "[")*2)
+	// Get count of loop items
+	LoopCount := strings.Count(brainfuck, "[")*2
+
+	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck, LoopCount))
+	intfuck = compiler.GetJumpMap(intfuck, LoopCount)
 
 	// Instantize brainfuck execution environment
 	bfc := runtime.Initbfc(max(strings.Count(brainfuck, ">")+1, 30000))
 
 	// Run brainfuck
-	bfc.RunUnsafe(intfuck, jumpmap)
+	bfc.RunUnsafe(intfuck)
 
 }
 
@@ -50,7 +58,7 @@ func main() {
 			fmt.Println(constants.Error+"Could not open file:", os.Args[2])
 			os.Exit(1)
 		}
-		indata = string(cont)
+		indata = ustring(cont)
 	} else {
 		indata = strings.Join(os.Args[1:], "")
 	}
