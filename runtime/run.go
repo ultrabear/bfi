@@ -1,6 +1,9 @@
 package runtime
 
 import (
+	"fmt"
+	"github.com/ultrabear/bfi/constants"
+	"os"
 	"unsafe"
 )
 
@@ -79,10 +82,18 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 			bfc.IncUnsafe()
 		case 2:
 			bfc.DecUnsafe()
-		case 3:
-			bfc.IncP()
-		case 4:
-			bfc.DecP()
+		case 3: // Manually inlined bfc.IncP
+			bfc.pointer++
+			if bfc.pointer >= len(bfc.buffer) {
+				fmt.Println(constants.RuntimeOverflow)
+				os.Exit(1)
+			}
+		case 4: // Manually inlined bfc.DecP
+			bfc.pointer--
+			if bfc.pointer < 0 {
+				fmt.Println(constants.RuntimeUnderflow)
+				os.Exit(1)
+			}
 		case 5:
 			bfc.Read()
 		case 6:
@@ -105,14 +116,20 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 			i++
 			next = *IndexUint(intfuck, i)
 			bfc.DecByUnsafe(next)
-		case 11:
+		case 11: // Manually inlined bfc.IncPBy
 			i++
-			next = *IndexUint(intfuck, i)
-			bfc.IncPBy(next)
-		case 12:
+			bfc.pointer += int(*IndexUint(intfuck, i))
+			if bfc.pointer >= len(bfc.buffer) {
+				fmt.Println(constants.RuntimeOverflow)
+				os.Exit(1)
+			}
+		case 12: // Manually inlined bfc.DecPBy
 			i++
-			next = *IndexUint(intfuck, i)
-			bfc.DecPBy(next)
+			bfc.pointer -= int(*IndexUint(intfuck, i))
+			if bfc.pointer < 0 {
+				fmt.Println(constants.RuntimeUnderflow)
+				os.Exit(1)
+			}
 		}
 	}
 }
