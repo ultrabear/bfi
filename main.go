@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ultrabear/bfi/compiler"
 	"github.com/ultrabear/bfi/constants"
+	"github.com/ultrabear/bfi/render"
 	"github.com/ultrabear/bfi/runtime"
 	"os"
 	"strings"
@@ -22,7 +23,7 @@ func ustring(s []byte) string {
 	return *(*string)(unsafe.Pointer(&s))
 }
 
-func RunFull(indata string) {
+func RunCompile(indata string) (string, []uint) {
 
 	// Check amount of loops
 	if strings.Count(indata, "[") != strings.Count(indata, "]") {
@@ -41,6 +42,13 @@ func RunFull(indata string) {
 	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck, LoopCount))
 	intfuck = compiler.GetJumpMap(intfuck, LoopCount)
 
+	return brainfuck, intfuck
+}
+
+func RunFull(indata string) {
+
+	brainfuck, intfuck := RunCompile(indata)
+
 	// Instantize brainfuck execution environment
 	bfc := runtime.Initbfc(max(strings.Count(brainfuck, ">")+1, 30000))
 
@@ -52,7 +60,7 @@ func main() {
 
 	var indata string
 
-	if len(os.Args) > 2 && os.Args[1] == "f" {
+	if len(os.Args) > 2 && strings.Contains(os.Args[1], "f") {
 		cont, readerr := os.ReadFile(os.Args[2])
 		if readerr != nil {
 			fmt.Println(constants.Error+"Could not open file:", os.Args[2])
@@ -61,6 +69,12 @@ func main() {
 		indata = ustring(cont)
 	} else {
 		indata = strings.Join(os.Args[1:], "")
+	}
+
+	if len(os.Args) > 1 && strings.Contains(os.Args[1], "r") {
+		_, intfuck := RunCompile(indata)
+		fmt.Println(render.StrIntFuck(intfuck))
+		os.Exit(0)
 	}
 
 	RunFull(indata)

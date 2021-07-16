@@ -13,43 +13,46 @@ func (bfc *Brainfuck) Run(intfuck []uint) {
 	// Benchmarks say yes somehow, this language has some
 	// stupid level optimizations that I will never understand
 
+	// Update on ^ I know why its faster !!
+	// Function inlining
+
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {
 		switch intfuck[i] {
-		case 0:
+		case constants.I_Zero:
 			bfc.Zero()
-		case 1:
+		case constants.I_Inc:
 			bfc.Inc()
-		case 2:
+		case constants.I_Dec:
 			bfc.Dec()
-		case 3:
+		case constants.I_IncP:
 			bfc.IncP()
-		case 4:
+		case constants.I_DecP:
 			bfc.DecP()
-		case 5:
+		case constants.I_Read:
 			bfc.Read()
-		case 6:
+		case constants.I_Write:
 			bfc.Write()
-		case 7:
+		case constants.I_LStart:
 			i++
 			if bfc.Cur() == 0 {
 				i = int(intfuck[i])
 			}
-		case 8:
+		case constants.I_LEnd:
 			i++
 			if bfc.Cur() != 0 {
 				i = int(intfuck[i])
 			}
-		case 9:
+		case constants.I_IncBy:
 			i++
 			bfc.IncBy(intfuck[i])
-		case 10:
+		case constants.I_DecBy:
 			i++
 			bfc.DecBy(intfuck[i])
-		case 11:
+		case constants.I_IncPBy:
 			i++
 			bfc.IncPBy(intfuck[i])
-		case 12:
+		case constants.I_DecPBy:
 			i++
 			bfc.DecPBy(intfuck[i])
 		}
@@ -76,54 +79,54 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 	for i := 0; i < len(intfuck); i++ {
 		next := *IndexUint(intfuck, i)
 		switch next {
-		case 0:
+		case constants.I_Zero:
 			bfc.ZeroUnsafe()
-		case 1:
+		case constants.I_Inc:
 			bfc.IncUnsafe()
-		case 2:
+		case constants.I_Dec:
 			bfc.DecUnsafe()
-		case 3: // Manually inlined bfc.IncP
+		case constants.I_IncP: // Manually inlined bfc.IncP
 			bfc.pointer++
 			if bfc.pointer >= len(bfc.buffer) {
 				fmt.Println(constants.RuntimeOverflow)
 				os.Exit(1)
 			}
-		case 4: // Manually inlined bfc.DecP
+		case constants.I_DecP: // Manually inlined bfc.DecP
 			bfc.pointer--
 			if bfc.pointer < 0 {
 				fmt.Println(constants.RuntimeUnderflow)
 				os.Exit(1)
 			}
-		case 5:
+		case constants.I_Read:
 			bfc.Read()
-		case 6:
+		case constants.I_Write:
 			bfc.Write()
-		case 7:
+		case constants.I_LStart:
 			i++
 			if bfc.CurUnsafe() == 0 {
 				i = int(*IndexUint(intfuck, i))
 			}
-		case 8:
+		case constants.I_LEnd:
 			i++
 			if bfc.CurUnsafe() != 0 {
 				i = int(*IndexUint(intfuck, i))
 			}
-		case 9:
+		case constants.I_IncBy:
 			i++
 			next = *IndexUint(intfuck, i)
 			bfc.IncByUnsafe(next)
-		case 10:
+		case constants.I_DecBy:
 			i++
 			next = *IndexUint(intfuck, i)
 			bfc.DecByUnsafe(next)
-		case 11: // Manually inlined bfc.IncPBy
+		case constants.I_IncPBy: // Manually inlined bfc.IncPBy
 			i++
 			bfc.pointer += int(*IndexUint(intfuck, i))
 			if bfc.pointer >= len(bfc.buffer) {
 				fmt.Println(constants.RuntimeOverflow)
 				os.Exit(1)
 			}
-		case 12: // Manually inlined bfc.DecPBy
+		case constants.I_DecPBy: // Manually inlined bfc.DecPBy
 			i++
 			bfc.pointer -= int(*IndexUint(intfuck, i))
 			if bfc.pointer < 0 {
