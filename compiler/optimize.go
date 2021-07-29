@@ -4,7 +4,7 @@ func ToIntfuck(bfc string, extra int) []uint {
 
 	// Convert the brainfuck to indexes of a list
 	// This lets it avoid hashing and converting in the mainloop
-	indexer := map[rune]uint{
+	indexer := [256]uint{
 		'0': 0,
 		'+': 1,
 		'-': 2,
@@ -19,10 +19,8 @@ func ToIntfuck(bfc string, extra int) []uint {
 	// Convert brainfuck string to intfuck
 	// Extra is added for adding loop data inplace
 	ints := make([]uint, 0, len(bfc)+extra)
-	for _, item := range bfc {
-		if instr, ok := indexer[item]; ok {
-			ints = append(ints, instr)
-		}
+	for i := 0; i < len(bfc); i++ {
+		ints = append(ints, indexer[bfc[i]])
 	}
 
 	return ints
