@@ -65,7 +65,7 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 	// In the event of a panic here check compiler.ToIntFuck
 	var totalstream []uint
 
-	if l := len(intfuck)+len(keepcompiled); l <= cap(intfuck) {
+	if l := len(intfuck) + len(keepcompiled); l <= cap(intfuck) {
 		totalstream = intfuck[:l]
 	} else {
 		panic("Not enough space allocated for loop instructions")
