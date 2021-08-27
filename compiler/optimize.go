@@ -1,6 +1,6 @@
 package compiler
 
-func ToIntfuck(bfc string, extra int) []uint {
+func ToIntfuck(bfc []byte, extra int) []uint {
 
 	// Convert the brainfuck to indexes of a list
 	// This lets it avoid hashing and converting in the mainloop

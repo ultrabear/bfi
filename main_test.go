@@ -15,7 +15,7 @@ func TestNormal(T *testing.T) {
 		if e != nil {
 			T.Error(e)
 		}
-		RunFull(string(s))
+		RunFull(s)
 	}
 
 }

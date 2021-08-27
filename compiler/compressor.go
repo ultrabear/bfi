@@ -2,36 +2,54 @@ package compiler
 
 import (
 	"runtime"
+	"bytes"
 	"strings"
+	"unsafe"
 )
 
-func countoccurances(indata string) bool {
-	return strings.Contains(indata, "><") || strings.Contains(indata, "<>") || strings.Contains(indata, "+-") || strings.Contains(indata, "-+") || strings.Contains(indata, "[]") || strings.Contains(indata, "[->-[-]<]")
+func stob(s string) []byte {
+	return []byte(s)
 }
 
-func stripoccurances(indata string) string {
-	r := strings.NewReplacer("><", "", "<>", "", "+-", "", "-+", "", "[]", "", "[->-[-]<]", "[-]>[-]<")
-	return r.Replace(indata)
+func ustring(s []byte) string {
+	return *(*string)(unsafe.Pointer(&s))
+}
+
+func countoccurances(indata []byte) bool {
+	return bytes.Contains(indata, stob("><")) || bytes.Contains(indata, stob("<>")) || bytes.Contains(indata, stob("+-")) || bytes.Contains(indata, stob("-+")) || bytes.Contains(indata, stob("[]")) || bytes.Contains(indata, stob("[->-[-]<]"))
+}
+
+func stripoccurances(indata []byte) []byte {
+	replacements := []string{
+		"><", "",
+		"<>", "",
+		"+-", "",
+		"-+", "",
+		"[]", "",
+		"[->-[-]<]", "[-]>[-]<",
+	}
+
+	r := strings.NewReplacer(replacements...)
+	return []byte(r.Replace(ustring(indata)))
 }
 
 // Filter a chunk to remove any non brainfuck instructions
-func filterchunk(s string, r chan string) {
+func filterchunk(s []byte, r chan []byte) {
 
-	var b strings.Builder
-
-	b.Grow(len(s))
+	ns := s[:0]
 
 	for _, in := range s {
 		switch in {
 		case '+', '-', '>', '<', '[', ']', ',', '.':
-			b.WriteByte(byte(in))
+			ns = append(ns, in)
 		}
 	}
 
-	r <- b.String()
+	r <- ns
+
 }
 
-func filterbfc(indata string) string {
+func filterbfc(indata []byte) []byte {
 
 	// The following code is confusing and long but it simply allocates the entire
 	// string into smaller parts and then throws them at threads to be stripped seperateley
@@ -43,16 +61,16 @@ func filterbfc(indata string) string {
 
 	// If the split size is so small many threads will probably only slow us down
 	if splitwidth < 100 {
-		rch := make(chan string)
+		rch := make(chan []byte)
 		go filterchunk(indata, rch)
 		return <-rch
 	}
 
-	returns := make([]chan string, ncpu)
+	returns := make([]chan []byte, ncpu)
 
 	// Send jobs to threads
 	for i := 0; i < len(returns); i++ {
-		returns[i] = make(chan string)
+		returns[i] = make(chan []byte)
 		nextwidth := (splitwidth * i) + splitwidth
 		if nextwidth > len(indata) {
 			nextwidth = len(indata)
@@ -61,14 +79,14 @@ func filterbfc(indata string) string {
 	}
 
 	// Get data back from threads
-	joindata := make([]string, 0, len(returns))
+	joindata := make([][]byte, 0, len(returns))
 	for _, item := range returns {
 		joindata = append(joindata, <-item)
 	}
-	return strings.Join(joindata, "")
+	return bytes.Join(joindata, []byte{})
 }
 
-func CompressBFC(indata string) string {
+func CompressBFC(indata []byte) []byte {
 	export := filterbfc(indata)
 	for countoccurances(export) {
 		export = stripoccurances(export)

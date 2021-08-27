@@ -7,8 +7,9 @@ import (
 	"github.com/ultrabear/bfi/render"
 	"github.com/ultrabear/bfi/runtime"
 	"os"
-	"strings"
+	"bytes"
 	"unsafe"
+	"strings"
 )
 
 func max(x, y int) int {
@@ -19,24 +20,29 @@ func max(x, y int) int {
 	}
 }
 
+var (
+	LStartByte = [1]byte{'['}
+	LEndByte = [1]byte{']'}
+)
+
 func ustring(s []byte) string {
 	return *(*string)(unsafe.Pointer(&s))
 }
 
-func RunCompile(indata string) (string, []uint) {
+func RunCompile(indata []byte) ([]byte, []uint) {
 
 	// Check amount of loops
-	if strings.Count(indata, "[") != strings.Count(indata, "]") {
+	if bytes.Count(indata, LStartByte[:]) != bytes.Count(indata, LEndByte[:]) {
 		fmt.Println(constants.SyntaxUnbalanced)
 		os.Exit(1)
 	}
 
 	// Compress brainfuck and run static optimizations
 	brainfuck := compiler.CompressBFC(indata)
-	brainfuck = strings.NewReplacer("[-]", "0", "[+]", "0").Replace(brainfuck)
+	brainfuck = []byte(strings.NewReplacer("[-]", "0", "[+]", "0").Replace(ustring(brainfuck)))
 
 	// Get count of loop items
-	LoopCount := strings.Count(brainfuck, "[") * 2
+	LoopCount := bytes.Count(brainfuck, LStartByte[:]) * 2
 
 	// Convert to intfuck and optimize
 	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck, LoopCount))
@@ -45,12 +51,12 @@ func RunCompile(indata string) (string, []uint) {
 	return brainfuck, intfuck
 }
 
-func RunFull(indata string) {
+func RunFull(indata []byte) {
 
 	brainfuck, intfuck := RunCompile(indata)
 
 	// Instantize brainfuck execution environment
-	bfc := runtime.Initbfc(max(strings.Count(brainfuck, ">")+1, 30000))
+	bfc := runtime.Initbfc(max(bytes.Count(brainfuck, []byte{'>'})+1, 30000))
 
 	// Run brainfuck
 	bfc.RunUnsafe(intfuck)
@@ -58,7 +64,7 @@ func RunFull(indata string) {
 
 func main() {
 
-	var indata string
+	var indata []byte
 
 	if len(os.Args) > 2 && strings.Contains(os.Args[1], "f") {
 		cont, readerr := os.ReadFile(os.Args[2])
@@ -66,9 +72,9 @@ func main() {
 			fmt.Println(constants.Error+"Could not open file:", os.Args[2])
 			os.Exit(1)
 		}
-		indata = ustring(cont)
+		indata = cont
 	} else {
-		indata = strings.Join(os.Args[1:], "")
+		indata = []byte(strings.Join(os.Args[1:], ""))
 	}
 
 	if len(os.Args) > 1 && strings.Contains(os.Args[1], "r") {
