@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ultrabear/bfi/constants"
 	"os"
-	"unsafe"
 )
 
 func (bfc *Brainfuck) Run(intfuck []uint) {
@@ -59,10 +58,6 @@ func (bfc *Brainfuck) Run(intfuck []uint) {
 	}
 }
 
-func IndexUint(slice []uint, i int) *uint {
-	return (*uint)(unsafe.Pointer(uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&slice))) + uintptr(i)*unsafe.Sizeof(uint(0))))
-}
-
 func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 
 	// Basically cursed, has a ~2.6% speed advantage over BrainFuck.Run
@@ -77,7 +72,7 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {
-		next := *IndexUint(intfuck, i)
+		next := intfuck[i]
 		switch next {
 		case constants.I_Zero:
 			bfc.ZeroUnsafe()
@@ -104,31 +99,31 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 		case constants.I_LStart:
 			i++
 			if bfc.CurUnsafe() == 0 {
-				i = int(*IndexUint(intfuck, i))
+				i = int(intfuck[i])
 			}
 		case constants.I_LEnd:
 			i++
 			if bfc.CurUnsafe() != 0 {
-				i = int(*IndexUint(intfuck, i))
+				i = int(intfuck[i])
 			}
 		case constants.I_IncBy:
 			i++
-			next = *IndexUint(intfuck, i)
+			next = intfuck[i]
 			bfc.IncByUnsafe(next)
 		case constants.I_DecBy:
 			i++
-			next = *IndexUint(intfuck, i)
+			next = intfuck[i]
 			bfc.DecByUnsafe(next)
 		case constants.I_IncPBy: // Manually inlined bfc.IncPBy
 			i++
-			bfc.pointer += int(*IndexUint(intfuck, i))
+			bfc.pointer += int(intfuck[i])
 			if bfc.pointer >= len(bfc.buffer) {
 				fmt.Println(constants.RuntimeOverflow)
 				os.Exit(1)
 			}
 		case constants.I_DecPBy: // Manually inlined bfc.DecPBy
 			i++
-			bfc.pointer -= int(*IndexUint(intfuck, i))
+			bfc.pointer -= int(intfuck[i])
 			if bfc.pointer < 0 {
 				fmt.Println(constants.RuntimeUnderflow)
 				os.Exit(1)
