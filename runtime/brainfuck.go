@@ -84,18 +84,19 @@ func (bfc *Brainfuck) DecPBy(amt uint) {
 }
 
 func (bfc *Brainfuck) Write() {
-	bfc.stdout.Write([]byte{bfc.buffer[bfc.pointer]})
+	bfc.stdout.Write(bfc.buffer[bfc.pointer:bfc.pointer+1])
 }
 
 func (bfc *Brainfuck) Read() {
-	var indata = make([]byte, 1)
-	amt, err := bfc.stdin.Read(indata)
-	if amt != 1 {
-		indata[0] = 0
-	}
+	indata := [1]byte{}
+
+	_, err := bfc.stdin.Read(indata[:])
+
 	if err != nil {
-		indata[0] = 0
+		bfc.buffer[bfc.pointer] = 0
+		return
 	}
+
 	bfc.buffer[bfc.pointer] = indata[0]
 }
 
