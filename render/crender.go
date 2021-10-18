@@ -49,15 +49,16 @@ int main() {`, CIF.Len)
 	out = append(out, header)
 
 	for i := 0; i < len(CIF.Data); i++ {
-		switch CIF.Data[i] {
+		v := CIF.Data[i]
+		switch v {
 		case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
-			out = append(out, cmapping[CIF.Data[i]])
+			out = append(out, cmapping[v])
 		case con.I_LStart, con.I_LEnd:
 			i++
-			out = append(out, cmapping[CIF.Data[i-1]])
+			out = append(out, cmapping[v])
 		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
 			i++
-			out = append(out, fmt.Sprintf(cmapping[CIF.Data[i-1]], CIF.Data[i]))
+			out = append(out, fmt.Sprintf(cmapping[v], CIF.Data[i]))
 		}
 	}
 
