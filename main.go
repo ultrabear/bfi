@@ -1,15 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/ultrabear/bfi/compiler"
 	"github.com/ultrabear/bfi/constants"
 	"github.com/ultrabear/bfi/render"
 	"github.com/ultrabear/bfi/runtime"
 	"os"
-	"bytes"
-	"unsafe"
 	"strings"
+	"unsafe"
 )
 
 func max(x, y int) int {
@@ -22,7 +22,7 @@ func max(x, y int) int {
 
 var (
 	LStartByte = [1]byte{'['}
-	LEndByte = [1]byte{']'}
+	LEndByte   = [1]byte{']'}
 )
 
 func ustring(s []byte) string {

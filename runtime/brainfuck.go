@@ -84,7 +84,7 @@ func (bfc *Brainfuck) DecPBy(amt uint) {
 }
 
 func (bfc *Brainfuck) Write() {
-	bfc.stdout.Write(bfc.buffer[bfc.pointer:bfc.pointer+1])
+	bfc.stdout.Write(bfc.buffer[bfc.pointer : bfc.pointer+1])
 }
 
 func (bfc *Brainfuck) Read() {

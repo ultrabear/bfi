@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"runtime"
 	"bytes"
+	"runtime"
 	"strings"
 	"unsafe"
 )
