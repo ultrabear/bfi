@@ -33,7 +33,7 @@ func RunCompile(indata []byte) ([]byte, []uint) {
 
 	// Check amount of loops
 	if bytes.Count(indata, LStartByte[:]) != bytes.Count(indata, LEndByte[:]) {
-		fmt.Println(constants.SyntaxUnbalanced)
+		fmt.Fprintln(os.Stderr, constants.SyntaxUnbalanced)
 		os.Exit(1)
 	}
 
@@ -69,7 +69,7 @@ func main() {
 	if len(os.Args) > 2 && strings.Contains(os.Args[1], "f") {
 		cont, readerr := os.ReadFile(os.Args[2])
 		if readerr != nil {
-			fmt.Println(constants.Error+"Could not open file:", os.Args[2])
+			fmt.Fprintln(os.Stderr, constants.Error+"Could not open file:", os.Args[2])
 			os.Exit(1)
 		}
 		indata = cont
@@ -82,7 +82,7 @@ func main() {
 		if strings.Contains(os.Args[1], "c") {
 			cintf := render.CIntFuck{
 				Data: intfuck,
-				Len: max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
+				Len:  max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
 			}
 			fmt.Println(cintf)
 		} else {

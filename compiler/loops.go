@@ -22,7 +22,7 @@ func (L *Looper) Compileloops() map[int]int {
 			}
 		} else {
 			if len(L.startloc) == 0 {
-				fmt.Println(constants.SyntaxEndBeforeStart)
+				fmt.Fprintln(os.Stderr, constants.SyntaxEndBeforeStart)
 				os.Exit(1)
 			}
 			datamap[L.precompiled[0][0]] = L.startloc[len(L.startloc)-1]

@@ -54,7 +54,7 @@ func (bfc *Brainfuck) DecByUnsafe(val uint) {
 func (bfc *Brainfuck) IncP() {
 	bfc.pointer++
 	if bfc.pointer >= len(bfc.buffer) {
-		fmt.Println(constants.RuntimeOverflow)
+		fmt.Fprintln(os.Stderr, constants.RuntimeOverflow)
 		os.Exit(1)
 	}
 }
@@ -62,7 +62,7 @@ func (bfc *Brainfuck) IncP() {
 func (bfc *Brainfuck) DecP() {
 	bfc.pointer--
 	if bfc.pointer < 0 {
-		fmt.Println(constants.RuntimeUnderflow)
+		fmt.Fprintln(os.Stderr, constants.RuntimeUnderflow)
 		os.Exit(1)
 	}
 }
@@ -70,7 +70,7 @@ func (bfc *Brainfuck) DecP() {
 func (bfc *Brainfuck) IncPBy(amt uint) {
 	bfc.pointer += int(amt)
 	if bfc.pointer >= len(bfc.buffer) {
-		fmt.Println(constants.RuntimeOverflow)
+		fmt.Fprintln(os.Stderr, constants.RuntimeOverflow)
 		os.Exit(1)
 	}
 }
@@ -78,7 +78,7 @@ func (bfc *Brainfuck) IncPBy(amt uint) {
 func (bfc *Brainfuck) DecPBy(amt uint) {
 	bfc.pointer -= int(amt)
 	if bfc.pointer < 0 {
-		fmt.Println(constants.RuntimeUnderflow)
+		fmt.Fprintln(os.Stderr, constants.RuntimeUnderflow)
 		os.Exit(1)
 	}
 }
