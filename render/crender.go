@@ -34,9 +34,19 @@ type CIntFuck struct {
 
 func (CIF CIntFuck) String() string {
 
-	cout := make([]string, 1, len(CIF.Data)+2)
+	out := make([]string, 0, len(CIF.Data)+2)
 
-	out := cout[:]
+	header := fmt.Sprintf(
+		`#include <stdio.h>
+
+#define ARRSIZE %d
+
+static char arr[ARRSIZE] = {0,};
+static long ptr = 0;
+
+int main() {`, CIF.Len)
+
+	out = append(out, header)
 
 	for i := 0; i < len(CIF.Data); i++ {
 		switch CIF.Data[i] {
@@ -51,12 +61,8 @@ func (CIF CIntFuck) String() string {
 		}
 	}
 
-	cout[0] = fmt.Sprintf("#include <stdio.h>\n#define ARRSIZE %d\nstatic char arr[ARRSIZE] = {0,};\nstatic long ptr = 0;\nint main() {", CIF.Len)
+	out = append(out, "}")
 
-	cout = cout[:len(out)+1]
-
-	cout[len(cout)-1] = "}"
-
-	return strings.Join(cout, "\n")
+	return strings.Join(out, "\n")
 
 }
