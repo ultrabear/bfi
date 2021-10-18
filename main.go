@@ -80,7 +80,11 @@ func main() {
 	if len(os.Args) > 1 && strings.Contains(os.Args[1], "r") {
 		brainfuck, intfuck := RunCompile(indata)
 		if strings.Contains(os.Args[1], "c") {
-			fmt.Println(render.CIntFuck{Data: intfuck, Len: max(bytes.Count(brainfuck, []byte{'>'})+1, 30000)}.String())
+			cintf := render.CIntFuck{
+				Data: intfuck,
+				Len: max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
+			}
+			fmt.Println(cintf)
 		} else {
 			fmt.Println(render.StrIntFuck(intfuck))
 		}
