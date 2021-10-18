@@ -1,6 +1,5 @@
-package render
-
 // Rendering tool for intfuck streams
+package render
 
 import (
 	"fmt"
