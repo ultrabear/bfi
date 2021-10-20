@@ -2,7 +2,7 @@ package compiler
 
 import (
 	"fmt"
-	"github.com/ultrabear/bfi/constants"
+	con "github.com/ultrabear/bfi/constants"
 	"os"
 )
 
@@ -11,6 +11,7 @@ type Looper struct {
 	startloc    []int
 }
 
+// TODO(ultrabear): move this to a [][2]int which then compiles to a map to avoid constant newmap allocations
 func (L *Looper) Compileloops() map[int]int {
 	datamap := map[int]int{}
 	for len(L.precompiled) > 0 {
@@ -22,7 +23,7 @@ func (L *Looper) Compileloops() map[int]int {
 			}
 		} else {
 			if len(L.startloc) == 0 {
-				fmt.Fprintln(os.Stderr, constants.SyntaxEndBeforeStart)
+				fmt.Fprintln(os.Stderr, con.SyntaxEndBeforeStart)
 				os.Exit(1)
 			}
 			datamap[L.precompiled[0][0]] = L.startloc[len(L.startloc)-1]
@@ -44,9 +45,10 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 
 	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
 		switch intfuck[i] {
-		case 9, 10, 11, 12: // Skip over special instructions
+		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+			// Skip over instructions with argument fields
 			i++
-		case 7, 8:
+		case con.I_LStart, con.I_LEnd:
 			loops.precompiled = append(loops.precompiled, [2]int{i, int(intfuck[i])})
 		}
 	}
@@ -68,7 +70,7 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 	if l := len(intfuck) + len(keepcompiled); l <= cap(intfuck) {
 		totalstream = intfuck[:l]
 	} else {
-		panic("Not enough space allocated for loop instructions")
+		panic("bfi/compiler.GetJumpMap: Not enough space allocated for loop instructions")
 	}
 
 	// loop count
