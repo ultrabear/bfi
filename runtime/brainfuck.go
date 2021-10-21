@@ -88,16 +88,12 @@ func (bfc *Brainfuck) Write() {
 }
 
 func (bfc *Brainfuck) Read() {
-	indata := [1]byte{}
 
-	_, err := bfc.stdin.Read(indata[:])
+	n, err := bfc.stdin.Read(bfc.buffer[bfc.pointer : bfc.pointer+1])
 
-	if err != nil {
+	if err != nil || n == 0 {
 		bfc.buffer[bfc.pointer] = 0
-		return
 	}
-
-	bfc.buffer[bfc.pointer] = indata[0]
 }
 
 func (bfc *Brainfuck) Zero() {
