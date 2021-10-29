@@ -58,6 +58,12 @@ func (bfc *Brainfuck) Run(intfuck []uint) {
 	}
 }
 
+// non inlined function to lower size of brainfuck interpreter loop code
+func pquit(s string) {
+	fmt.Fprintln(os.Stderr, s)
+	os.Exit(1)
+}
+
 func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 
 	// Basically cursed, has a ~2.6% speed advantage over BrainFuck.Run
@@ -83,14 +89,12 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 		case constants.I_IncP: // Manually inlined bfc.IncP
 			bfc.pointer++
 			if bfc.pointer >= len(bfc.buffer) {
-				fmt.Println(constants.RuntimeOverflow)
-				os.Exit(1)
+				pquit(constants.RuntimeOverflow)
 			}
 		case constants.I_DecP: // Manually inlined bfc.DecP
 			bfc.pointer--
 			if bfc.pointer < 0 {
-				fmt.Println(constants.RuntimeUnderflow)
-				os.Exit(1)
+				pquit(constants.RuntimeUnderflow)
 			}
 		case constants.I_Read:
 			bfc.Read()
@@ -118,15 +122,13 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 			i++
 			bfc.pointer += int(intfuck[i])
 			if bfc.pointer >= len(bfc.buffer) {
-				fmt.Println(constants.RuntimeOverflow)
-				os.Exit(1)
+				pquit(constants.RuntimeOverflow)
 			}
 		case constants.I_DecPBy: // Manually inlined bfc.DecPBy
 			i++
 			bfc.pointer -= int(intfuck[i])
 			if bfc.pointer < 0 {
-				fmt.Println(constants.RuntimeUnderflow)
-				os.Exit(1)
+				pquit(constants.RuntimeUnderflow)
 			}
 		}
 	}
