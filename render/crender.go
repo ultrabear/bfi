@@ -4,6 +4,7 @@ package render
 import (
 	"fmt"
 	con "github.com/ultrabear/bfi/constants"
+	"io"
 	"strings"
 )
 
@@ -11,20 +12,30 @@ import (
 // char* arr
 // long ptr
 
+const endl = "\n"
+
 var cmapping = [...]string{
-	con.I_Zero:   "arr[ptr] = 0;",
-	con.I_Inc:    "arr[ptr]++;",
-	con.I_Dec:    "arr[ptr]--;",
-	con.I_IncP:   "ptr++;",
-	con.I_DecP:   "ptr--;",
-	con.I_Read:   "arr[ptr] = fgetc(stdin);",
-	con.I_Write:  "fputc(arr[ptr], stdout);",
-	con.I_LStart: "while (arr[ptr] != 0) {",
-	con.I_LEnd:   "}",
-	con.I_IncBy:  "arr[ptr] += %d;",
-	con.I_DecBy:  "arr[ptr] -= %d;",
-	con.I_IncPBy: "ptr += %d;",
-	con.I_DecPBy: "ptr -= %d;",
+	con.I_Zero:   "arr[ptr] = 0;" + endl,
+	con.I_Inc:    "arr[ptr]++;" + endl,
+	con.I_Dec:    "arr[ptr]--;" + endl,
+	con.I_IncP:   "ptr++;" + endl,
+	con.I_DecP:   "ptr--;" + endl,
+	con.I_Read:   "arr[ptr] = fgetc(stdin);" + endl,
+	con.I_Write:  "fputc(arr[ptr], stdout);" + endl,
+	con.I_LStart: "while (arr[ptr] != 0) {" + endl,
+	con.I_LEnd:   "}" + endl,
+	con.I_IncBy:  "arr[ptr] += %d;" + endl,
+	con.I_DecBy:  "arr[ptr] -= %d;" + endl,
+	con.I_IncPBy: "ptr += %d;" + endl,
+	con.I_DecPBy: "ptr -= %d;" + endl,
+}
+
+var bmapping = make([][]byte, len(cmapping))
+
+func init() {
+	for i, v := range cmapping {
+		bmapping[i] = []byte(v)
+	}
 }
 
 type CIntFuck struct {
@@ -32,9 +43,9 @@ type CIntFuck struct {
 	Len  int
 }
 
-func (CIF CIntFuck) String() string {
+func (CIF *CIntFuck) WriteTo(w io.Writer) (int64, error) {
 
-	out := make([]string, 0, len(CIF.Data)+2)
+	var total int64
 
 	header := fmt.Sprintf(
 		`#include <stdio.h>
@@ -44,26 +55,57 @@ func (CIF CIntFuck) String() string {
 static char arr[ARRSIZE] = {0,};
 static long ptr = 0;
 
-int main() {`, CIF.Len)
+int main() {
+`, CIF.Len)
 
-	out = append(out, header)
+	n, err := w.Write([]byte(header))
+
+	total += int64(n)
+	if err != nil {
+		goto Fail
+	}
 
 	for i := 0; i < len(CIF.Data); i++ {
 		v := CIF.Data[i]
 		switch v {
 		case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
-			out = append(out, cmapping[v])
+			n, err = w.Write(bmapping[v])
+
+			total += int64(n)
+			if err != nil {
+				goto Fail
+			}
 		case con.I_LStart, con.I_LEnd:
 			i++
-			out = append(out, cmapping[v])
+			n, err = w.Write(bmapping[v])
+
+			total += int64(n)
+			if err != nil {
+				goto Fail
+			}
 		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
 			i++
-			out = append(out, fmt.Sprintf(cmapping[v], CIF.Data[i]))
+			n, err = w.Write([]byte(fmt.Sprintf(cmapping[v], CIF.Data[i])))
+
+			total += int64(n)
+			if err != nil {
+				goto Fail
+			}
 		}
 	}
 
-	out = append(out, "}")
+	n, err = w.Write([]byte("}\n"))
+	total += int64(n)
 
-	return strings.Join(out, "\n")
+Fail:
+	return total, err
+}
 
+func (CIF *CIntFuck) String() string {
+
+	var b strings.Builder
+
+	CIF.WriteTo(&b)
+
+	return b.String()
 }

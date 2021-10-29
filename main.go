@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/ultrabear/bfi/compiler"
@@ -84,7 +85,7 @@ func main() {
 				Data: intfuck,
 				Len:  max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
 			}
-			fmt.Println(cintf)
+			cintf.WriteTo(bufio.NewWriter(os.Stdout))
 		} else {
 			fmt.Println(render.StrIntFuck(intfuck))
 		}
