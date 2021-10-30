@@ -15,7 +15,7 @@ func ustring(s []byte) string {
 	return *(*string)(unsafe.Pointer(&s))
 }
 
-func countoccurances(indata []byte) bool {
+func hasoccurances(indata []byte) bool {
 	return bytes.Contains(indata, stob("><")) || bytes.Contains(indata, stob("<>")) || bytes.Contains(indata, stob("+-")) || bytes.Contains(indata, stob("-+")) || bytes.Contains(indata, stob("[]")) || bytes.Contains(indata, stob("[->-[-]<]"))
 }
 
@@ -34,7 +34,7 @@ func stripoccurances(indata []byte) []byte {
 }
 
 // Filter a chunk to remove any non brainfuck instructions
-func filterchunk(s []byte, r chan []byte) {
+func filterchunk(s []byte, r *[]byte, fin chan struct{}) {
 
 	ns := s[:0]
 
@@ -45,7 +45,8 @@ func filterchunk(s []byte, r chan []byte) {
 		}
 	}
 
-	r <- ns
+	(*r) = ns
+	fin <- struct{}{}
 
 }
 
@@ -61,34 +62,38 @@ func filterbfc(indata []byte) []byte {
 
 	// If the split size is so small many threads will probably only slow us down
 	if splitwidth < 100 {
-		rch := make(chan []byte)
-		go filterchunk(indata, rch)
-		return <-rch
+		var rch []byte
+		done := make(chan struct{})
+		go filterchunk(indata, &rch, done)
+		<-done
+		return rch
 	}
 
-	returns := make([]chan []byte, ncpu)
+	status := make(chan struct{})
+	await := 0
+	returns := make([][]byte, ncpu)
 
 	// Send jobs to threads
 	for i := 0; i < len(returns); i++ {
-		returns[i] = make(chan []byte)
 		nextwidth := (splitwidth * i) + splitwidth
 		if nextwidth > len(indata) {
 			nextwidth = len(indata)
 		}
-		go filterchunk((indata)[splitwidth*i:nextwidth], returns[i])
+		go filterchunk((indata)[splitwidth*i:nextwidth], &returns[i], status)
+		await++
 	}
 
-	// Get data back from threads
-	joindata := make([][]byte, 0, len(returns))
-	for _, item := range returns {
-		joindata = append(joindata, <-item)
+	// Wait for data back from threads
+	for ; await != 0; await-- {
+		<-status
 	}
-	return bytes.Join(joindata, []byte{})
+
+	return bytes.Join(returns, []byte{})
 }
 
 func CompressBFC(indata []byte) []byte {
 	export := filterbfc(indata)
-	for countoccurances(export) {
+	for hasoccurances(export) {
 		export = stripoccurances(export)
 	}
 	return export
