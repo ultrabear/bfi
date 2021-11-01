@@ -85,7 +85,9 @@ func main() {
 				Data: intfuck,
 				Len:  max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
 			}
-			cintf.WriteTo(bufio.NewWriter(os.Stdout))
+			w := bufio.NewWriter(os.Stdout)
+			cintf.WriteTo(w)
+			w.Flush()
 		} else {
 			fmt.Println(render.StrIntFuck(intfuck))
 		}
