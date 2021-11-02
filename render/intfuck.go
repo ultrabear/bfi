@@ -3,7 +3,7 @@ package render
 
 import (
 	"fmt"
-	"github.com/ultrabear/bfi/constants"
+	con "github.com/ultrabear/bfi/constants"
 	"strconv"
 	"strings"
 )
@@ -17,40 +17,49 @@ func max(a, b int) int {
 }
 
 type bwriter struct {
-	i          int
+	i          *int
 	padding    int
 	intpadding string
 	getindex   func(int) uint
 }
 
 func (b *bwriter) writeinst(inst, col string) string {
-	return fmt.Sprintf("%s%0"+b.intpadding+"d:"+strings.Repeat("=", b.padding-len(inst))+"%s%s", b.pcol(col), b.i, inst, b.pcol(""))
+	return fmt.Sprintf("%s%0"+b.intpadding+"d:"+strings.Repeat("=", b.padding-len(inst))+"%s"+colNone, col, *(b.i), inst)
 }
 
 func (b *bwriter) writeval(col string) string {
-	return fmt.Sprintf("%s%0"+b.intpadding+"d:"+"%0"+strconv.Itoa(b.padding)+"d%s", b.pcol(col), b.i, b.getindex(b.i), b.pcol(""))
+	return fmt.Sprintf("%s%0"+b.intpadding+"d:%0"+strconv.Itoa(b.padding)+"d"+colNone, col, *(b.i), b.getindex(*(b.i)))
 }
 
-func (b *bwriter) pcol(col string) string {
-	switch col {
-	case "red":
-		return "\033[91m"
-	case "green":
-		return "\033[92m"
-	case "yellow":
-		return "\033[93m"
-	case "blue":
-		return "\033[94m"
-	case "magenta":
-		return "\033[95m"
-	case "cyan":
-		return "\033[96m"
-	case "white":
-		return "\033[97m"
-	default:
-		return "\033[0m"
-	}
+const (
+	colGreen = "\033[92m"
+	colBlue = "\033[94m"
+	colRed = "\033[91m"
+	colCyan = "\033[96m"
+	colNone = "\033[0m"
+)
+
+type instruc struct {
+	name string
+	col string
 }
+
+var instrucs = [...]instruc{
+	con.I_Zero:   {"ZERO", colGreen},
+	con.I_Inc:    {"INC", colGreen},
+	con.I_Dec:    {"DEC", colGreen},
+	con.I_IncP:   {"INCP", colBlue},
+	con.I_DecP:   {"DECP", colBlue},
+	con.I_Read:   {"READ", colRed},
+	con.I_Write:  {"WRITE", colRed},
+	con.I_LStart: {"LSTRT", colCyan},
+	con.I_LEnd:   {"LEND", colCyan},
+	con.I_IncBy:  {"INCB", colGreen},
+	con.I_DecBy:  {"DECB", colGreen},
+	con.I_IncPBy: {"INCPB", colBlue},
+	con.I_DecPBy: {"DECPB", colBlue},
+}
+
 
 type StrIntFuck []uint
 
@@ -75,63 +84,32 @@ func (SIF StrIntFuck) String() string {
 
 	b.WriteByte('[')
 
-	for i := 0; i < len(SIF); i++ {
+	{
+
+		i := 0
+		w.i = &i
+
+	for i = 0; i < len(SIF); i++ {
 		if i != 0 {
 			b.WriteByte(' ')
 		}
-		w.i = i
 		switch SIF[i] {
-		case constants.I_Zero:
-			b.WriteString(w.writeinst("ZERO", "green"))
-		case constants.I_Inc:
-			b.WriteString(w.writeinst("INC", "green"))
-		case constants.I_Dec:
-			b.WriteString(w.writeinst("DEC", "green"))
-		case constants.I_IncP:
-			b.WriteString(w.writeinst("INCP", "blue"))
-		case constants.I_DecP:
-			b.WriteString(w.writeinst("DECP", "blue"))
-		case constants.I_Read:
-			b.WriteString(w.writeinst("READ", "red"))
-		case constants.I_Write:
-			b.WriteString(w.writeinst("WRITE", "red"))
-		case constants.I_LStart:
-			b.WriteString(w.writeinst("LSTRT", "cyan"))
+		case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
+			v := instrucs[SIF[i]]
+			b.WriteString(w.writeinst(v.name, v.col))
+
+		case con.I_LStart, con.I_LEnd, con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+			v := instrucs[SIF[i]]
+
+			b.WriteString(w.writeinst(v.name, v.col))
+
 			i++
-			w.i = i
 			b.WriteByte(' ')
-			b.WriteString(w.writeval("cyan"))
-		case constants.I_LEnd:
-			b.WriteString(w.writeinst("LEND", "cyan"))
-			i++
-			w.i = i
-			b.WriteByte(' ')
-			b.WriteString(w.writeval("cyan"))
-		case constants.I_IncBy:
-			b.WriteString(w.writeinst("INCB", "green"))
-			i++
-			w.i = i
-			b.WriteByte(' ')
-			b.WriteString(w.writeval("green"))
-		case constants.I_DecBy:
-			b.WriteString(w.writeinst("DECB", "green"))
-			i++
-			w.i = i
-			b.WriteByte(' ')
-			b.WriteString(w.writeval("green"))
-		case constants.I_IncPBy:
-			b.WriteString(w.writeinst("INCPB", "blue"))
-			i++
-			w.i = i
-			b.WriteByte(' ')
-			b.WriteString(w.writeval("blue"))
-		case constants.I_DecPBy:
-			b.WriteString(w.writeinst("DECPB", "blue"))
-			i++
-			w.i = i
-			b.WriteByte(' ')
-			b.WriteString(w.writeval("blue"))
+
+			b.WriteString(w.writeval(v.col))
 		}
+	}
+
 	}
 
 	b.WriteByte(']')
