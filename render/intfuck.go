@@ -33,15 +33,15 @@ func (b *bwriter) writeval(col string) string {
 
 const (
 	colGreen = "\033[92m"
-	colBlue = "\033[94m"
-	colRed = "\033[91m"
-	colCyan = "\033[96m"
-	colNone = "\033[0m"
+	colBlue  = "\033[94m"
+	colRed   = "\033[91m"
+	colCyan  = "\033[96m"
+	colNone  = "\033[0m"
 )
 
 type instruc struct {
 	name string
-	col string
+	col  string
 }
 
 var instrucs = [...]instruc{
@@ -59,7 +59,6 @@ var instrucs = [...]instruc{
 	con.I_IncPBy: {"INCPB", colBlue},
 	con.I_DecPBy: {"DECPB", colBlue},
 }
-
 
 type StrIntFuck []uint
 
@@ -89,26 +88,26 @@ func (SIF StrIntFuck) String() string {
 		i := 0
 		w.i = &i
 
-	for i = 0; i < len(SIF); i++ {
-		if i != 0 {
-			b.WriteByte(' ')
+		for i = 0; i < len(SIF); i++ {
+			if i != 0 {
+				b.WriteByte(' ')
+			}
+			switch SIF[i] {
+			case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
+				v := instrucs[SIF[i]]
+				b.WriteString(w.writeinst(v.name, v.col))
+
+			case con.I_LStart, con.I_LEnd, con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+				v := instrucs[SIF[i]]
+
+				b.WriteString(w.writeinst(v.name, v.col))
+
+				i++
+				b.WriteByte(' ')
+
+				b.WriteString(w.writeval(v.col))
+			}
 		}
-		switch SIF[i] {
-		case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
-			v := instrucs[SIF[i]]
-			b.WriteString(w.writeinst(v.name, v.col))
-
-		case con.I_LStart, con.I_LEnd, con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
-			v := instrucs[SIF[i]]
-
-			b.WriteString(w.writeinst(v.name, v.col))
-
-			i++
-			b.WriteByte(' ')
-
-			b.WriteString(w.writeval(v.col))
-		}
-	}
 
 	}
 
