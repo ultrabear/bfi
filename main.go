@@ -21,6 +21,12 @@ func max(x, y int) int {
 	}
 }
 
+// fatal will print to stderr and exit
+func fatal(args ...interface{}) {
+	fmt.Fprintln(os.Stderr, args...)
+	os.Exit(1)
+}
+
 var (
 	LStartByte = [1]byte{'['}
 	LEndByte   = [1]byte{']'}
@@ -34,8 +40,7 @@ func RunCompile(indata []byte) ([]byte, []uint) {
 
 	// Check amount of loops
 	if bytes.Count(indata, LStartByte[:]) != bytes.Count(indata, LEndByte[:]) {
-		fmt.Fprintln(os.Stderr, constants.SyntaxUnbalanced)
-		os.Exit(1)
+		fatal(constants.SyntaxUnbalanced)
 	}
 
 	// Compress brainfuck and run static optimizations
@@ -63,34 +68,86 @@ func RunFull(indata []byte) {
 	bfc.RunUnsafe(intfuck)
 }
 
-func main() {
+type conf struct {
+	n string
+	b bool
+}
+
+type confContainer map[string]*conf
+
+func (C confContainer) newConf(n string) *conf {
+	c := &conf{n: n}
+	C[n] = c
+	return c
+}
+
+func (C confContainer) parse() {
+
+	if len(os.Args) > 1 {
+
+		for k, v := range C {
+			v.b = strings.Contains(os.Args[1], k)
+		}
+
+	}
+}
+
+func getbrainfuckstring(b bool) []byte {
 
 	var indata []byte
 
-	if len(os.Args) > 2 && strings.Contains(os.Args[1], "f") {
-		cont, readerr := os.ReadFile(os.Args[2])
-		if readerr != nil {
-			fmt.Fprintln(os.Stderr, constants.Error+"Could not open file:", os.Args[2])
-			os.Exit(1)
+	if b {
+		if len(os.Args) > 2 {
+			cont, readerr := os.ReadFile(os.Args[2])
+			if readerr != nil {
+				fatal(constants.Error+"Could not open file:", os.Args[2])
+			}
+			indata = cont
+		} else {
+			fatal(constants.Error + "Could not open file:")
 		}
-		indata = cont
 	} else {
 		indata = []byte(strings.Join(os.Args[1:], ""))
 	}
 
-	if len(os.Args) > 1 && strings.Contains(os.Args[1], "r") {
-		brainfuck, intfuck := RunCompile(indata)
-		if strings.Contains(os.Args[1], "c") {
-			cintf := render.CIntFuck{
-				Data: intfuck,
-				Len:  max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
-			}
-			w := bufio.NewWriter(os.Stdout)
-			cintf.WriteTo(w)
-			w.Flush()
-		} else {
-			fmt.Println(render.StrIntFuck(intfuck))
+	return indata
+}
+
+func renderbrainfuck(indata []byte, renderc bool) {
+
+	brainfuck, intfuck := RunCompile(indata)
+
+	if renderc {
+		cintf := render.CIntFuck{
+			Data: intfuck,
+			Len:  max(bytes.Count(brainfuck, []byte{'>'})+1, 30000),
 		}
+
+		w := bufio.NewWriter(os.Stdout)
+		cintf.WriteTo(w)
+		w.Flush()
+
+		return
+	}
+
+	fmt.Println(render.StrIntFuck(intfuck))
+
+}
+
+func main() {
+
+	conf := make(confContainer)
+
+	f := conf.newConf("f")
+	r := conf.newConf("r")
+	c := conf.newConf("c")
+
+	conf.parse()
+
+	indata := getbrainfuckstring(f.b)
+
+	if r.b {
+		renderbrainfuck(indata, c.b)
 		os.Exit(0)
 	}
 
