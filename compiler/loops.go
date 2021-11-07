@@ -9,30 +9,64 @@ import (
 type Looper struct {
 	precompiled [][2]int
 	startloc    []int
+	output      [][2]int
 }
 
-// TODO(ultrabear): move this to a [][2]int which then compiles to a map to avoid constant newmap allocations
-func (L *Looper) Compileloops() map[int]int {
-	datamap := map[int]int{}
+// Recursive section of CompileLoops
+func (L *Looper) innerCompileLoops() {
+
 	for len(L.precompiled) > 0 {
-		if L.precompiled[0][1] == 7 {
-			L.startloc = append(L.startloc, L.precompiled[0][0])
-			L.precompiled = L.precompiled[1:]
-			for k, v := range L.Compileloops() {
-				datamap[k] = v
-			}
+
+
+		// Pop(0) slice
+		val := L.precompiled[0]
+		L.precompiled = L.precompiled[1:]
+
+		// Value is a [
+		if val[1] == 7 {
+
+			// Add index to lifo stack
+			L.startloc = append(L.startloc, val[0])
+
+			// Continue searching for [] pairs
+			L.innerCompileLoops()
+
 		} else {
+
+			// Exit if ][ has occured
 			if len(L.startloc) == 0 {
 				fmt.Fprintln(os.Stderr, con.SyntaxEndBeforeStart)
 				os.Exit(1)
 			}
-			datamap[L.precompiled[0][0]] = L.startloc[len(L.startloc)-1]
-			L.precompiled = L.precompiled[1:]
+
+			// Add value and pop off lifo stack
+			L.output = append(L.output, [2]int{val[0], L.startloc[len(L.startloc)-1]})
 			L.startloc = L.startloc[:len(L.startloc)-1]
-			return datamap
+
+			return
 		}
+
 	}
+
+}
+
+// Recursively compiles loops
+func (L *Looper) Compileloops() map[int]int {
+
+	// Init output slice
+	L.output = make([][2]int, 0, len(L.precompiled)/2)
+
+	L.innerCompileLoops()
+
+	datamap := make(map[int]int, len(L.output)*2)
+
+	for _, v := range L.output {
+		datamap[v[0]] = v[1]
+		datamap[v[1]] = v[0]
+	}
+
 	return datamap
+
 }
 
 func GetJumpMap(intfuck []uint, sizeof int) []uint {
@@ -57,9 +91,6 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 	keepcompiled := loops.precompiled
 
 	jumpmap := loops.Compileloops() // 3. Compile loops recursively
-	for k, v := range jumpmap {
-		jumpmap[v] = k
-	}
 
 	// Should extend to enough space for inline loop instructions
 	// If not this will panic
@@ -77,7 +108,7 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 	lc := 0
 
 	// Calculate indexes of all values and store them for later
-	indexes := map[int]int{}
+	indexes := make(map[int]int, len(keepcompiled))
 	for i, v := range keepcompiled {
 		indexes[v[0]] = i
 	}
