@@ -39,9 +39,9 @@ func (L *Looper) innerCompileLoops() {
 			}
 
 			// Add value
-			start, stop := val[0], L.startloc[len(L.startloc)-1]
-			L.outmap[start] = stop
-			L.outmap[stop] = start
+			LStop, LStart := val[0], L.startloc[len(L.startloc)-1]
+			L.outmap[LStart] = LStop
+			L.outmap[LStop] = LStart
 
 			// Pop off lifo stack
 			L.startloc = L.startloc[:len(L.startloc)-1]
