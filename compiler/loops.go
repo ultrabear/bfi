@@ -17,7 +17,6 @@ func (L *Looper) innerCompileLoops() {
 
 	for len(L.precompiled) > 0 {
 
-
 		// Pop(0) slice
 		val := L.precompiled[0]
 		L.precompiled = L.precompiled[1:]
