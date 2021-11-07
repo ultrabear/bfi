@@ -9,7 +9,7 @@ import (
 type Looper struct {
 	precompiled [][2]int
 	startloc    []int
-	output      [][2]int
+	outmap      map[int]int
 }
 
 // Recursive section of CompileLoops
@@ -38,8 +38,12 @@ func (L *Looper) innerCompileLoops() {
 				os.Exit(1)
 			}
 
-			// Add value and pop off lifo stack
-			L.output = append(L.output, [2]int{val[0], L.startloc[len(L.startloc)-1]})
+			// Add value
+			start, stop := val[0], L.startloc[len(L.startloc)-1]
+			L.outmap[start] = stop
+			L.outmap[stop] = start
+
+			// Pop off lifo stack
 			L.startloc = L.startloc[:len(L.startloc)-1]
 
 			return
@@ -53,18 +57,11 @@ func (L *Looper) innerCompileLoops() {
 func (L *Looper) Compileloops() map[int]int {
 
 	// Init output slice
-	L.output = make([][2]int, 0, len(L.precompiled)/2)
+	L.outmap = make(map[int]int, len(L.precompiled))
 
 	L.innerCompileLoops()
 
-	datamap := make(map[int]int, len(L.output)*2)
-
-	for _, v := range L.output {
-		datamap[v[0]] = v[1]
-		datamap[v[1]] = v[0]
-	}
-
-	return datamap
+	return L.outmap
 
 }
 
