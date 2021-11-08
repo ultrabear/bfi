@@ -12,23 +12,16 @@ type Looper struct {
 	outmap      map[int]int
 }
 
-// Recursive section of CompileLoops
+// Looping section of CompileLoops
 func (L *Looper) innerCompileLoops() {
 
-	for len(L.precompiled) > 0 {
-
-		// Pop(0) slice
-		val := L.precompiled[0]
-		L.precompiled = L.precompiled[1:]
+	for _, val := range L.precompiled {
 
 		// Value is a [
 		if val[1] == 7 {
 
 			// Add index to lifo stack
 			L.startloc = append(L.startloc, val[0])
-
-			// Continue searching for [] pairs
-			L.innerCompileLoops()
 
 		} else {
 
@@ -46,14 +39,13 @@ func (L *Looper) innerCompileLoops() {
 			// Pop off lifo stack
 			L.startloc = L.startloc[:len(L.startloc)-1]
 
-			return
 		}
 
 	}
 
 }
 
-// Recursively compiles loops
+// Compiles loops
 func (L *Looper) Compileloops() map[int]int {
 
 	// Init output slice
