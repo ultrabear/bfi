@@ -35,24 +35,32 @@ func PMoptimize(input []uint) []uint {
 		4: 12,
 	}
 	for i := 0; i < len(input); i++ {
+
+		// Test if input is in optimizable range
 		if _, ok := types[input[i]]; ok {
+
+			// Amount of times instruction repeats
 			ctr := uint(1)
-			for ctr > 0 {
-				if i+1 < len(input) && input[i] == input[i+1] {
-					i++
-					ctr++
-				} else {
-					if ctr == 1 {
-						newlist = append(newlist, input[i])
-					} else {
-						newlist = append(newlist, types[input[i]], ctr)
-					}
-					ctr = 0
-				}
+
+			// Test if cur and next input are the same and count till not true
+			for i+1 < len(input) && input[i] == input[i+1] {
+				i++
+				ctr++
 			}
+
+			// Check if instruction occurs more than once
+			if ctr == 1 {
+				newlist = append(newlist, input[i])
+			} else {
+				newlist = append(newlist, types[input[i]], ctr)
+			}
+
 		} else {
+			// Non optimizable instructions
 			newlist = append(newlist, input[i])
 		}
-	}
+
+	} // End for loop
+
 	return newlist
 }
