@@ -57,28 +57,8 @@ func (L *Looper) Compileloops() map[int]int {
 
 }
 
-func GetJumpMap(intfuck []uint, sizeof int) []uint {
-
-	// Compile brainfuck loops (3 steps)
-	loops := Looper{ // 1. Create looper object to handle loops
-		precompiled: make([][2]int, 0, sizeof),
-		startloc:    make([]int, 0, (sizeof+1)/2),
-	}
-
-	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
-		switch intfuck[i] {
-		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
-			// Skip over instructions with argument fields
-			i++
-		case con.I_LStart, con.I_LEnd:
-			loops.precompiled = append(loops.precompiled, [2]int{i, int(intfuck[i])})
-		}
-	}
-
-	// Store original data for later
-	keepcompiled := loops.precompiled
-
-	jumpmap := loops.Compileloops() // 3. Compile loops recursively
+// embedJumpMap will embed the jump points into the intfuck stream
+func embedJumpMap(intfuck []uint, jumpmap map[int]int, keepcompiled [][2]int) []uint {
 
 	// Should extend to enough space for inline loop instructions
 	// If not this will panic
@@ -123,4 +103,28 @@ func GetJumpMap(intfuck []uint, sizeof int) []uint {
 
 	// The length of intfuck is changed, return the new slice header
 	return totalstream
+}
+
+func GetJumpMap(intfuck []uint, sizeof int) []uint {
+
+	// Compile brainfuck loops (3 steps)
+	loops := Looper{ // 1. Create looper object to handle loops
+		precompiled: make([][2]int, 0, sizeof),
+		startloc:    make([]int, 0, (sizeof+1)/2),
+	}
+
+	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
+		switch intfuck[i] {
+		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+			// Skip over instructions with argument fields
+			i++
+		case con.I_LStart, con.I_LEnd:
+			loops.precompiled = append(loops.precompiled, [2]int{i, int(intfuck[i])})
+		}
+	}
+
+	jumpmap := loops.Compileloops() // 3. Compile loops recursively
+
+	// Embed jumpmap into stream and return stream header
+	return embedJumpMap(intfuck, jumpmap, loops.precompiled)
 }
