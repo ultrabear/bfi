@@ -30,7 +30,7 @@ var cmapping = [...]string{
 	con.I_DecPBy: "ptr -= %d;" + endl,
 }
 
-var bmapping = make([][]byte, len(cmapping))
+var bmapping = [len(cmapping)][]byte{}
 
 func init() {
 	for i, v := range cmapping {
