@@ -2,10 +2,11 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/ultrabear/bfi/constants"
 	"io"
 	"os"
 	"unsafe"
+
+	"github.com/ultrabear/bfi/constants"
 )
 
 func IndexByte(slice []byte, i int) *byte {
@@ -84,7 +85,7 @@ func (bfc *Brainfuck) DecPBy(amt uint) {
 }
 
 func (bfc *Brainfuck) Write() {
-	bfc.stdout.Write(bfc.buffer[bfc.pointer : bfc.pointer+1])
+	_, _ = bfc.stdout.Write(bfc.buffer[bfc.pointer : bfc.pointer+1])
 }
 
 func (bfc *Brainfuck) Read() {

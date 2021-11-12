@@ -2,8 +2,9 @@ package compiler
 
 import (
 	"fmt"
-	con "github.com/ultrabear/bfi/constants"
 	"os"
+
+	con "github.com/ultrabear/bfi/constants"
 )
 
 type Looper struct {

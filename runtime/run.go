@@ -2,8 +2,9 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/ultrabear/bfi/constants"
 	"os"
+
+	"github.com/ultrabear/bfi/constants"
 )
 
 func (bfc *Brainfuck) Run(intfuck []uint) {
@@ -64,17 +65,15 @@ func pquit(s string) {
 	os.Exit(1)
 }
 
+// RunUnsafe will run brainfuck code with
+// removed bounds checks on array accesses.
+// It also has manually inlined functions and as such is
+// the fastest way to interpret intfuck in bfi
 func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 
 	// Basically cursed, has a ~2.6% speed advantage over BrainFuck.Run
 	// Reads from the slices underlying memory location using unsafe pointers
 	// This lets it bypass bounds checking, which is what gives a minor speed bump
-	// As noted this is unsafe and on a corrupt intfuck slice could read uninit memory instead of bounds check and panic
-	// Only use this when you know the input is not corrupt, for development it is worth it to swap to BrianFuck.Run
-
-	if len(intfuck) == 0 {
-		return
-	}
 
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {

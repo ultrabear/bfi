@@ -1,11 +1,13 @@
-// Rendering tool for intfuck streams
+// Render is a collection of rendering tools for intfuck
+// streams to other formats.
 package render
 
 import (
 	"fmt"
-	con "github.com/ultrabear/bfi/constants"
 	"strconv"
 	"strings"
+
+	con "github.com/ultrabear/bfi/constants"
 )
 
 func max(a, b int) int {

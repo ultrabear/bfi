@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"os"
+	"strings"
+	"unsafe"
+
 	"github.com/ultrabear/bfi/compiler"
 	"github.com/ultrabear/bfi/constants"
 	"github.com/ultrabear/bfi/render"
 	"github.com/ultrabear/bfi/runtime"
-	"os"
-	"strings"
-	"unsafe"
 )
 
 func max(x, y int) int {
@@ -124,7 +125,7 @@ func renderbrainfuck(indata []byte, renderc bool) {
 		}
 
 		w := bufio.NewWriter(os.Stdout)
-		cintf.WriteTo(w)
+		_, _ = cintf.WriteTo(w)
 		w.Flush()
 
 		return

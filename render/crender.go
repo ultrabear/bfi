@@ -1,11 +1,11 @@
-// Rendering tool for intfuck to C
 package render
 
 import (
 	"fmt"
-	con "github.com/ultrabear/bfi/constants"
 	"io"
 	"strings"
+
+	con "github.com/ultrabear/bfi/constants"
 )
 
 // #define ARRSIZE X
@@ -105,7 +105,7 @@ func (CIF *CIntFuck) String() string {
 
 	var b strings.Builder
 
-	CIF.WriteTo(&b)
+	_, _ = CIF.WriteTo(&b)
 
 	return b.String()
 }
