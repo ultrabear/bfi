@@ -1,4 +1,4 @@
-// Render is a collection of rendering tools for intfuck
+// Package render is a collection of rendering tools for intfuck
 // streams to other formats.
 package render
 
@@ -13,9 +13,8 @@ import (
 func max(a, b int) int {
 	if a > b {
 		return a
-	} else {
-		return b
 	}
+	return b
 }
 
 type bwriter struct {
@@ -47,21 +46,22 @@ type instruc struct {
 }
 
 var instrucs = [...]instruc{
-	con.I_Zero:   {"ZERO", colGreen},
-	con.I_Inc:    {"INC", colGreen},
-	con.I_Dec:    {"DEC", colGreen},
-	con.I_IncP:   {"INCP", colBlue},
-	con.I_DecP:   {"DECP", colBlue},
-	con.I_Read:   {"READ", colRed},
-	con.I_Write:  {"WRITE", colRed},
-	con.I_LStart: {"LSTRT", colCyan},
-	con.I_LEnd:   {"LEND", colCyan},
-	con.I_IncBy:  {"INCB", colGreen},
-	con.I_DecBy:  {"DECB", colGreen},
-	con.I_IncPBy: {"INCPB", colBlue},
-	con.I_DecPBy: {"DECPB", colBlue},
+	con.InstrucZero:   {"ZERO", colGreen},
+	con.InstrucInc:    {"INC", colGreen},
+	con.InstrucDec:    {"DEC", colGreen},
+	con.InstrucIncP:   {"INCP", colBlue},
+	con.InstrucDecP:   {"DECP", colBlue},
+	con.InstrucRead:   {"READ", colRed},
+	con.InstrucWrite:  {"WRITE", colRed},
+	con.InstrucLStart: {"LSTRT", colCyan},
+	con.InstrucLEnd:   {"LEND", colCyan},
+	con.InstrucIncBy:  {"INCB", colGreen},
+	con.InstrucDecBy:  {"DECB", colGreen},
+	con.InstrucIncPBy: {"INCPB", colBlue},
+	con.InstrucDecPBy: {"DECPB", colBlue},
 }
 
+// StrIntFuck is a wrapper for representing intfuck as a human readable string
 type StrIntFuck []uint
 
 func (SIF StrIntFuck) String() string {
@@ -95,11 +95,11 @@ func (SIF StrIntFuck) String() string {
 				b.WriteByte(' ')
 			}
 			switch SIF[i] {
-			case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
+			case con.InstrucZero, con.InstrucInc, con.InstrucDec, con.InstrucIncP, con.InstrucDecP, con.InstrucRead, con.InstrucWrite:
 				v := instrucs[SIF[i]]
 				b.WriteString(w.writeinst(v.name, v.col))
 
-			case con.I_LStart, con.I_LEnd, con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+			case con.InstrucLStart, con.InstrucLEnd, con.InstrucIncBy, con.InstrucDecBy, con.InstrucIncPBy, con.InstrucDecPBy:
 				v := instrucs[SIF[i]]
 
 				b.WriteString(w.writeinst(v.name, v.col))

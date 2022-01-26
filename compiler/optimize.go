@@ -1,19 +1,24 @@
 package compiler
 
+import (
+	con "github.com/ultrabear/bfi/constants"
+)
+
+// ToIntfuck converts a stream of brainfuck text into intfuck instructions
 func ToIntfuck(bfc []byte, extra int) []uint {
 
 	// Convert the brainfuck to indexes of a list
 	// This lets it avoid hashing and converting in the mainloop
 	indexer := [256]uint{
-		'0': 0,
-		'+': 1,
-		'-': 2,
-		'>': 3,
-		'<': 4,
-		',': 5,
-		'.': 6,
-		'[': 7,
-		']': 8,
+		'0': con.InstrucZero,
+		'+': con.InstrucInc,
+		'-': con.InstrucDec,
+		'>': con.InstrucIncP,
+		'<': con.InstrucDecP,
+		',': con.InstrucRead,
+		'.': con.InstrucWrite,
+		'[': con.InstrucLStart,
+		']': con.InstrucLEnd,
 	}
 
 	// Convert brainfuck string to intfuck
@@ -26,13 +31,14 @@ func ToIntfuck(bfc []byte, extra int) []uint {
 	return ints
 }
 
+// PMoptimize optimizes out repeat instructions into single instructions
 func PMoptimize(input []uint) []uint {
 	newlist := input[:0]
 	types := map[uint]uint{
-		1: 9,
-		2: 10,
-		3: 11,
-		4: 12,
+		con.InstrucInc:  con.InstrucIncBy,
+		con.InstrucDec:  con.InstrucDecBy,
+		con.InstrucIncP: con.InstrucIncPBy,
+		con.InstrucDecP: con.InstrucDecPBy,
 	}
 	for i := 0; i < len(input); i++ {
 

@@ -1,3 +1,4 @@
+// Package constants contains predefined constants for bfc format
 package constants
 
 // Define errors here to avoid looking for them in the code
@@ -11,17 +12,17 @@ const (
 
 // Define instructions
 const (
-	I_Zero uint = iota
-	I_Inc
-	I_Dec
-	I_IncP
-	I_DecP
-	I_Read
-	I_Write
-	I_LStart
-	I_LEnd
-	I_IncBy
-	I_DecBy
-	I_IncPBy
-	I_DecPBy
+	InstrucZero uint = iota
+	InstrucInc
+	InstrucDec
+	InstrucIncP
+	InstrucDecP
+	InstrucRead
+	InstrucWrite
+	InstrucLStart
+	InstrucLEnd
+	InstrucIncBy
+	InstrucDecBy
+	InstrucIncPBy
+	InstrucDecPBy
 )

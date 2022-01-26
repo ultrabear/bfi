@@ -1,3 +1,4 @@
+// Bfc interpreter written in go
 package main
 
 import (
@@ -17,9 +18,8 @@ import (
 func max(x, y int) int {
 	if x > y {
 		return x
-	} else {
-		return y
 	}
+	return y
 }
 
 // fatal will print to stderr and exit
@@ -29,18 +29,19 @@ func fatal(args ...interface{}) {
 }
 
 var (
-	LStartByte = [1]byte{'['}
-	LEndByte   = [1]byte{']'}
+	lStartByte = []byte{'['}
+	lEndByte   = []byte{']'}
 )
 
 func ustring(s []byte) string {
 	return *(*string)(unsafe.Pointer(&s))
 }
 
+// RunCompile compiles a stream of bfc to compressed bfc and a intfuck stream, it also optimizes the stream
 func RunCompile(indata []byte) ([]byte, []uint) {
 
 	// Check amount of loops
-	if bytes.Count(indata, LStartByte[:]) != bytes.Count(indata, LEndByte[:]) {
+	if bytes.Count(indata, lStartByte) != bytes.Count(indata, lEndByte) {
 		fatal(constants.SyntaxUnbalanced)
 	}
 
@@ -49,7 +50,7 @@ func RunCompile(indata []byte) ([]byte, []uint) {
 	brainfuck = []byte(strings.NewReplacer("[-]", "0", "[+]", "0").Replace(ustring(brainfuck)))
 
 	// Get count of loop items
-	LoopCount := bytes.Count(brainfuck, LStartByte[:]) * 2
+	LoopCount := bytes.Count(brainfuck, lStartByte) * 2
 
 	// Convert to intfuck and optimize
 	intfuck := compiler.PMoptimize(compiler.ToIntfuck(brainfuck, LoopCount))
@@ -58,6 +59,7 @@ func RunCompile(indata []byte) ([]byte, []uint) {
 	return brainfuck, intfuck
 }
 
+// RunFull runs the given brainfuck from compiling to running to exiting error handling
 func RunFull(indata []byte) {
 
 	brainfuck, intfuck := RunCompile(indata)

@@ -7,14 +7,14 @@ import (
 	con "github.com/ultrabear/bfi/constants"
 )
 
-type Looper struct {
+type looper struct {
 	precompiled [][2]int
 	startloc    []int
 	outmap      map[int]int
 }
 
 // Looping section of CompileLoops
-func (L *Looper) innerCompileLoops() {
+func (L *looper) innerCompileLoops() {
 
 	for _, val := range L.precompiled {
 
@@ -47,7 +47,7 @@ func (L *Looper) innerCompileLoops() {
 }
 
 // Compiles loops
-func (L *Looper) Compileloops() map[int]int {
+func (L *looper) compileloops() map[int]int {
 
 	// Init output slice
 	L.outmap = make(map[int]int, len(L.precompiled))
@@ -106,25 +106,26 @@ func embedJumpMap(intfuck []uint, jumpmap map[int]int, keepcompiled [][2]int) []
 	return totalstream
 }
 
+// GetJumpMap will embed jump points into the intfuck stream after calculating their indexes
 func GetJumpMap(intfuck []uint, sizeof int) []uint {
 
 	// Compile brainfuck loops (3 steps)
-	loops := Looper{ // 1. Create looper object to handle loops
+	loops := looper{ // 1. Create looper object to handle loops
 		precompiled: make([][2]int, 0, sizeof),
 		startloc:    make([]int, 0, (sizeof+1)/2),
 	}
 
 	for i := 0; i < len(intfuck); i++ { // 2. Add [ ] to list
 		switch intfuck[i] {
-		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+		case con.InstrucIncBy, con.InstrucDecBy, con.InstrucIncPBy, con.InstrucDecPBy:
 			// Skip over instructions with argument fields
 			i++
-		case con.I_LStart, con.I_LEnd:
+		case con.InstrucLStart, con.InstrucLEnd:
 			loops.precompiled = append(loops.precompiled, [2]int{i, int(intfuck[i])})
 		}
 	}
 
-	jumpmap := loops.Compileloops() // 3. Compile loops recursively
+	jumpmap := loops.compileloops() // 3. Compile loops recursively
 
 	// Embed jumpmap into stream and return stream header
 	return embedJumpMap(intfuck, jumpmap, loops.precompiled)

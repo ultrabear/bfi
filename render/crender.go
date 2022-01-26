@@ -15,19 +15,19 @@ import (
 const endl = "\n"
 
 var cmapping = [...]string{
-	con.I_Zero:   "arr[ptr] = 0;" + endl,
-	con.I_Inc:    "arr[ptr]++;" + endl,
-	con.I_Dec:    "arr[ptr]--;" + endl,
-	con.I_IncP:   "ptr++;" + endl,
-	con.I_DecP:   "ptr--;" + endl,
-	con.I_Read:   "arr[ptr] = fgetc(stdin);" + endl,
-	con.I_Write:  "fputc(arr[ptr], stdout);" + endl,
-	con.I_LStart: "while (arr[ptr] != 0) {" + endl,
-	con.I_LEnd:   "}" + endl,
-	con.I_IncBy:  "arr[ptr] += %d;" + endl,
-	con.I_DecBy:  "arr[ptr] -= %d;" + endl,
-	con.I_IncPBy: "ptr += %d;" + endl,
-	con.I_DecPBy: "ptr -= %d;" + endl,
+	con.InstrucZero:   "arr[ptr] = 0;" + endl,
+	con.InstrucInc:    "arr[ptr]++;" + endl,
+	con.InstrucDec:    "arr[ptr]--;" + endl,
+	con.InstrucIncP:   "ptr++;" + endl,
+	con.InstrucDecP:   "ptr--;" + endl,
+	con.InstrucRead:   "arr[ptr] = fgetc(stdin);" + endl,
+	con.InstrucWrite:  "fputc(arr[ptr], stdout);" + endl,
+	con.InstrucLStart: "while (arr[ptr] != 0) {" + endl,
+	con.InstrucLEnd:   "}" + endl,
+	con.InstrucIncBy:  "arr[ptr] += %d;" + endl,
+	con.InstrucDecBy:  "arr[ptr] -= %d;" + endl,
+	con.InstrucIncPBy: "ptr += %d;" + endl,
+	con.InstrucDecPBy: "ptr -= %d;" + endl,
 }
 
 var bmapping = [len(cmapping)][]byte{}
@@ -38,11 +38,13 @@ func init() {
 	}
 }
 
+// CIntFuck is a wrapper for transpiling intfuck to C source code
 type CIntFuck struct {
 	Data []uint
 	Len  int
 }
 
+// WriteTo implements the io.WriterTo interface
 func (CIF *CIntFuck) WriteTo(w io.Writer) (int64, error) {
 
 	var total int64
@@ -68,14 +70,14 @@ int main() {
 	for i := 0; i < len(CIF.Data); i++ {
 		v := CIF.Data[i]
 		switch v {
-		case con.I_Zero, con.I_Inc, con.I_Dec, con.I_IncP, con.I_DecP, con.I_Read, con.I_Write:
+		case con.InstrucZero, con.InstrucInc, con.InstrucDec, con.InstrucIncP, con.InstrucDecP, con.InstrucRead, con.InstrucWrite:
 			n, err = w.Write(bmapping[v])
 
 			total += int64(n)
 			if err != nil {
 				goto Fail
 			}
-		case con.I_LStart, con.I_LEnd:
+		case con.InstrucLStart, con.InstrucLEnd:
 			i++
 			n, err = w.Write(bmapping[v])
 
@@ -83,7 +85,7 @@ int main() {
 			if err != nil {
 				goto Fail
 			}
-		case con.I_IncBy, con.I_DecBy, con.I_IncPBy, con.I_DecPBy:
+		case con.InstrucIncBy, con.InstrucDecBy, con.InstrucIncPBy, con.InstrucDecPBy:
 			i++
 			n, err = w.Write([]byte(fmt.Sprintf(cmapping[v], CIF.Data[i])))
 

@@ -7,6 +7,7 @@ import (
 	"github.com/ultrabear/bfi/constants"
 )
 
+// Run will run brainfuck code
 func (bfc *Brainfuck) Run(intfuck []uint) {
 
 	// Can golang make it faster with pure switches?
@@ -19,40 +20,40 @@ func (bfc *Brainfuck) Run(intfuck []uint) {
 	// Mainloop over brainfuck
 	for i := 0; i < len(intfuck); i++ {
 		switch intfuck[i] {
-		case constants.I_Zero:
+		case constants.InstrucZero:
 			bfc.Zero()
-		case constants.I_Inc:
+		case constants.InstrucInc:
 			bfc.Inc()
-		case constants.I_Dec:
+		case constants.InstrucDec:
 			bfc.Dec()
-		case constants.I_IncP:
+		case constants.InstrucIncP:
 			bfc.IncP()
-		case constants.I_DecP:
+		case constants.InstrucDecP:
 			bfc.DecP()
-		case constants.I_Read:
+		case constants.InstrucRead:
 			bfc.Read()
-		case constants.I_Write:
+		case constants.InstrucWrite:
 			bfc.Write()
-		case constants.I_LStart:
+		case constants.InstrucLStart:
 			i++
 			if bfc.Cur() == 0 {
 				i = int(intfuck[i])
 			}
-		case constants.I_LEnd:
+		case constants.InstrucLEnd:
 			i++
 			if bfc.Cur() != 0 {
 				i = int(intfuck[i])
 			}
-		case constants.I_IncBy:
+		case constants.InstrucIncBy:
 			i++
 			bfc.IncBy(intfuck[i])
-		case constants.I_DecBy:
+		case constants.InstrucDecBy:
 			i++
 			bfc.DecBy(intfuck[i])
-		case constants.I_IncPBy:
+		case constants.InstrucIncPBy:
 			i++
 			bfc.IncPBy(intfuck[i])
-		case constants.I_DecPBy:
+		case constants.InstrucDecPBy:
 			i++
 			bfc.DecPBy(intfuck[i])
 		}
@@ -79,51 +80,51 @@ func (bfc *Brainfuck) RunUnsafe(intfuck []uint) {
 	for i := 0; i < len(intfuck); i++ {
 		next := intfuck[i]
 		switch next {
-		case constants.I_Zero:
+		case constants.InstrucZero:
 			bfc.ZeroUnsafe()
-		case constants.I_Inc:
+		case constants.InstrucInc:
 			bfc.IncUnsafe()
-		case constants.I_Dec:
+		case constants.InstrucDec:
 			bfc.DecUnsafe()
-		case constants.I_IncP: // Manually inlined bfc.IncP
+		case constants.InstrucIncP: // Manually inlined bfc.IncP
 			bfc.pointer++
 			if bfc.pointer >= len(bfc.buffer) {
 				pquit(constants.RuntimeOverflow)
 			}
-		case constants.I_DecP: // Manually inlined bfc.DecP
+		case constants.InstrucDecP: // Manually inlined bfc.DecP
 			bfc.pointer--
 			if bfc.pointer < 0 {
 				pquit(constants.RuntimeUnderflow)
 			}
-		case constants.I_Read:
+		case constants.InstrucRead:
 			bfc.Read()
-		case constants.I_Write:
+		case constants.InstrucWrite:
 			bfc.Write()
-		case constants.I_LStart:
+		case constants.InstrucLStart:
 			i++
 			if bfc.CurUnsafe() == 0 {
 				i = int(intfuck[i])
 			}
-		case constants.I_LEnd:
+		case constants.InstrucLEnd:
 			i++
 			if bfc.CurUnsafe() != 0 {
 				i = int(intfuck[i])
 			}
-		case constants.I_IncBy:
+		case constants.InstrucIncBy:
 			i++
 			next = intfuck[i]
 			bfc.IncByUnsafe(next)
-		case constants.I_DecBy:
+		case constants.InstrucDecBy:
 			i++
 			next = intfuck[i]
 			bfc.DecByUnsafe(next)
-		case constants.I_IncPBy: // Manually inlined bfc.IncPBy
+		case constants.InstrucIncPBy: // Manually inlined bfc.IncPBy
 			i++
 			bfc.pointer += int(intfuck[i])
 			if bfc.pointer >= len(bfc.buffer) {
 				pquit(constants.RuntimeOverflow)
 			}
-		case constants.I_DecPBy: // Manually inlined bfc.DecPBy
+		case constants.InstrucDecPBy: // Manually inlined bfc.DecPBy
 			i++
 			bfc.pointer -= int(intfuck[i])
 			if bfc.pointer < 0 {

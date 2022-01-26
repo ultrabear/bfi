@@ -1,3 +1,4 @@
+// Package compiler contains functions for compiling brainfuck to intfuck and optimizing
 package compiler
 
 import (
@@ -91,6 +92,7 @@ func filterbfc(indata []byte) []byte {
 	return bytes.Join(returns, []byte{})
 }
 
+// CompressBFC removes any non brainfuck characters and then removes opposing brainfuck instructions
 func CompressBFC(indata []byte) []byte {
 	export := filterbfc(indata)
 	for hasoccurances(export) {
