@@ -20,7 +20,7 @@ var cmapping = [...]string{
 	con.InstrucDec:    "arr[ptr]--;" + endl,
 	con.InstrucIncP:   "ptr++;" + endl,
 	con.InstrucDecP:   "ptr--;" + endl,
-	con.InstrucRead:   "arr[ptr] = fgetc(stdin);" + endl,
+	con.InstrucRead:   "arr[ptr] = fgetc(stdin); if (feof(stdin)) arr[ptr] = 0;" + endl,
 	con.InstrucWrite:  "fputc(arr[ptr], stdout);" + endl,
 	con.InstrucLStart: "while (arr[ptr] != 0) {" + endl,
 	con.InstrucLEnd:   "}" + endl,
