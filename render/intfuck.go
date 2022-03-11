@@ -72,7 +72,7 @@ func (SIF StrIntFuck) String() string {
 	ipad := len(strconv.Itoa(len(SIF)))
 	padding := max(ipad, 5)
 
-	// padding for item, ipad for index, +1 for :, +9 for color control codes, + len-1 for seperator space, +2 for []
+	// padding for item, ipad for index, +1 for :, +9 for color control codes, + len-1 for separator space, +2 for []
 	tlen := ((padding+ipad+1+9)*len(SIF) + len(SIF) - 1 + 2)
 	b.Grow(tlen)
 

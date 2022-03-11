@@ -64,7 +64,7 @@ func RunFull(indata []byte) {
 
 	brainfuck, intfuck := RunCompile(indata)
 
-	// Instantize brainfuck execution environment
+	// Instantiate brainfuck execution environment
 	bfc := runtime.Initbfc(max(bytes.Count(brainfuck, []byte{'>'})+1, 30000))
 
 	// Run brainfuck

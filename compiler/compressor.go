@@ -54,7 +54,7 @@ func filterchunk(s []byte, r *[]byte, fin chan struct{}) {
 func filterbfc(indata []byte) []byte {
 
 	// The following code is confusing and long but it simply allocates the entire
-	// string into smaller parts and then throws them at threads to be stripped seperateley
+	// string into smaller parts and then throws them at threads to be stripped separately
 	// this gives a considerable speed improvement
 
 	ncpu := runtime.NumCPU()

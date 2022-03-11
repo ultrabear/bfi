@@ -26,7 +26,7 @@ func (L *looper) innerCompileLoops() {
 
 		} else {
 
-			// Exit if ][ has occured
+			// Exit if ][ has occurred
 			if len(L.startloc) == 0 {
 				fmt.Fprintln(os.Stderr, con.SyntaxEndBeforeStart)
 				os.Exit(1)
